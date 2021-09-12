@@ -15,11 +15,11 @@ export default {
     props: {
         backgroundColor: {
             type: String,
-            default: "transparent",
+            default: "button-primary-bgcolor",
         },
         border: {
             type: String,
-            default: "1px solid #333",
+            default: "#fff",
         },
         borderRadius: {
             type: String,
@@ -27,7 +27,7 @@ export default {
         },
         color: {
             type: String,
-            default: "#333",
+            default: "button-primary-color",
         },
         fontSize: {
             type: String,
@@ -51,19 +51,23 @@ export default {
         },
         showShadow: {
             type: Boolean,
-            default: true,
+            default: false,
         },
+        dropShadow: {
+            type: String,
+            default: "0 13px 15px -13px rgb(242, 95, 58)"
+        }
     },
     data() {
         return {
             styleObject: {
-                backgroundColor: this.transparent,
+                backgroundColor: `var(--${this.backgroundColor})`,
                 border: this.border,
                 borderRadius: this.borderRadius,
                 boxShadow: this.showShadow
-                    ? "0 13px 15px -13px rgb(242, 95, 58)"
+                    ? `var(--${this.dropShadow})`
                     : "",
-                color: this.color,
+                color: `var(--${this.color})`,
                 fontSize: this.fontSize,
                 fontWeight: this.fontWeight,
                 minWidth: this.minWidth,

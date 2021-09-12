@@ -1,29 +1,31 @@
-# vue3-website-starter
+# set-list-manager
 
 ## Project setup
-```
-npm install
+
+```bash
+yarn install
 ```
 
 ### Compiles and hot-reloads for development
-```
-npm run serve
+
+```bash
+yarn run serve-dev
 ```
 
 ### Compiles and minifies for production
-```
-npm run build
+
+```bash
+yarn run build-prod
 ```
 
 ### Run your unit tests
-```
-npm run test:unit
+
+```bash
+yarn run test-unit
 ```
 
 ### Lints and fixes files
-```
-npm run lint
-```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+```bash
+yarn run lint
+```

@@ -1,11 +1,7 @@
 <template>
     <div class="home">
-        <div class="hero">
-            <div class="outer-container">
-                <h1 class="hero-heading">
-                    Hero Heading
-                </h1>
-            </div>
+        <div class="content">
+
         </div>
     </div>
 </template>
@@ -18,9 +14,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.hero {
+.content {
     height: 50rem;
     padding: 6rem 0;
-    background-color: $red-bright;
+    background-color: var(--color-primary);
 }
 </style>

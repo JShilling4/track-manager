@@ -35,6 +35,22 @@ export default {
 </script>
 
 <style lang="scss">
-@import "~@/assets/scss/base";
-@import "~@/assets/scss/typography";
+@import "~@/design/scss/variables";
+@import "~@/design/scss/base";
+@import "~@/design/scss/typography";
+
+.container {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+.errorColor {
+    color: rgb(255, 51, 51);
+}
+.successColor {
+    color: rgb(14, 211, 119);
+}
+.neutralColor {
+    color: rgb(65, 130, 252);
+}
 </style>

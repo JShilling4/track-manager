@@ -1,35 +1,29 @@
 <template>
     <header class="header">
-        <img
-            src="@/assets/images/logo.svg"
-            alt="Manage logo"
-            class="logo"
-        />
+        <div>
+            <h1>Set List Manager</h1>
+        </div>
 
         <nav
             v-if="showMobileMenu"
             class="nav"
         >
-            <a
-                href="#"
+            <router-link
+                to="/"
                 class="nav-item"
-            >Link</a>
-            <a
-                href="#"
+            >Home</router-link>
+            <router-link
+                to="/tracks"
                 class="nav-item"
-            >Link</a>
-            <a
-                href="#"
+            >Tracks</router-link>
+            <router-link
+                to="/lists"
                 class="nav-item"
-            >Link</a>
-            <a
-                href="#"
+            >Lists</router-link>
+            <router-link
+                to="/calendar"
                 class="nav-item"
-            >Link</a>
-            <a
-                href="#"
-                class="nav-item"
-            >Link</a>
+            >Calendar</router-link>
         </nav>
 
         <img
@@ -46,8 +40,6 @@
             @click="$emit('open')"
             class="hamburger"
         >
-
-        <base-button :show-shadow="false">Get Started</base-button>
     </header>
 </template>
 
@@ -93,10 +85,11 @@ export default {
             top: 10rem;
         }
         .nav-item {
+            position: relative;
             margin: 0 1.85rem;
             font-size: 1.5rem;
             font-weight: 900;
-            color: $blue-dark;
+            color: var(--blue-dark);
             transition: color 0.3s;
             @include breakpoint(tablet-land) {
                 margin: 0;
@@ -109,6 +102,15 @@ export default {
             }
             &:hover {
                 color: lighten(#333, 40%);
+            }
+            &.router-link-active:after {
+                position: absolute;
+                left: 0;
+                bottom: -.5rem;
+                content: "";
+                height: 2px;
+                width: 100%;
+                background-color: aqua;
             }
         }
     }
