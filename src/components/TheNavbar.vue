@@ -110,7 +110,7 @@ export default {
                 content: "";
                 height: 2px;
                 width: 100%;
-                background-color: aqua;
+                background-color: var(--color-primary);
             }
         }
     }

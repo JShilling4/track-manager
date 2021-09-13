@@ -34,6 +34,7 @@ export default {
 };
 </script>
 
+<style src="@vueform/multiselect/themes/default.css"></style>
 <style lang="scss">
 @import "~@/design/scss/variables";
 @import "~@/design/scss/base";
@@ -42,6 +43,12 @@ export default {
 .container {
     max-width: 1500px;
     margin: 0 auto;
+}
+
+.multiselect {
+    --ms-font-size: 1.6rem;
+    --ms-option-font-size: 1.4rem;
+    height: var(--input-height);
 }
 
 .errorColor {

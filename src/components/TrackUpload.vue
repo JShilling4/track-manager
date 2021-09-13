@@ -63,17 +63,19 @@ import { storage, tracksCollection } from "@/includes/firebase";
 export default {
     name: "Upload",
     props: {
-        addSong: {
+        addTrack: {
             type: Function,
             required: true,
         },
     },
+
     data() {
         return {
             isDragover: false,
             uploads: [],
         };
     },
+
     methods: {
         uploadSong(event) {
             this.isDragover = false;
@@ -85,16 +87,16 @@ export default {
                 if (file.type !== "audio/mpeg") {
                     return;
                 }
-
+                const fileName = file.name.split('.').slice(0, -1).join('.');
                 const storageRef = storage.ref(); // music-hub-d0bcb.appspot.com
-                const tracksRef = storageRef.child(`tracks/${file.name}`); // music-hub-d0bcb.appspot.com/songs/example.mp3
+                const tracksRef = storageRef.child(`tracks/${fileName}`); // music-hub-d0bcb.appspot.com/songs/example.mp3
                 const task = tracksRef.put(file);
 
                 const uploadIndex =
                     this.uploads.push({
                         task,
                         currentProgress: 0,
-                        name: file.name,
+                        name: fileName,
                         variant: "neutralColor",
                         icon: "fas fa-spinner fa-spin",
                         textClass: "",
@@ -116,18 +118,21 @@ export default {
                     },
                     async () => {
                         const track = {
-                            displayName: "",
+                            artist: "",
                             originalName: task.snapshot.ref.name,
                             modifiedName: task.snapshot.ref.name,
-                            genre: "",
-                            commentCount: 0,
+                            category: "",
+                            key: "",
+                            bpm: "",
+                            referenceLink: "",
+                            notes: ""
                         };
 
                         track.url = await task.snapshot.ref.getDownloadURL();
                         const trackRef = await tracksCollection.add(track);
                         const trackSnapshot = await trackRef.get();
 
-                        this.addSong(trackSnapshot);
+                        this.addTrack(trackSnapshot);
 
                         this.uploads[uploadIndex].variant = "successColor";
                         this.uploads[uploadIndex].icon = "fas fa-check";
@@ -137,6 +142,7 @@ export default {
             });
         },
     },
+
     beforeUnmount() {
         this.uploads.forEach((upload) => {
             upload.task.cancel();
@@ -163,7 +169,7 @@ export default {
         border-bottom: 2px solid gray;
 
         .icon {
-            color: teal;
+            color: var(--color-primary);
             font-size: 2rem;
         }
     }
@@ -181,7 +187,7 @@ export default {
             transition: all .5s;
             &:hover {
                 color: #fff;
-                background-color: teal;
+                background-color: var(--color-primary);
             }
         }
 

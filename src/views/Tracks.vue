@@ -3,7 +3,7 @@
         <div class="content">
             <!-- Upload Area -->
             <div class="upload-container">
-                <track-upload :add-song="addTrack" />
+                <track-upload :add-track="addTrack" />
             </div>
 
             <!-- Uploaded List -->
@@ -44,44 +44,35 @@ export default {
         "track-upload": TrackUpload,
         "track-item": TrackItem,
     },
+
     data() {
         return {
             tracks: [],
-            unsavedFlag: false,
         };
     },
+
     methods: {
         updateTrack(i, values) {
             this.tracks[i].modifiedName = values.modifiedName;
-            this.tracks[i].genre = values.genre;
+            this.tracks[i].category = values.category;
         },
+
         removeTrack(i) {
             this.tracks.splice(i, 1);
         },
+
         addTrack(document) {
             const track = {
                 ...document.data(),
                 docID: document.id,
             };
-
             this.tracks.push(track);
         },
-        updateUnsavedFlag(value) {
-            this.unsavedFlag = value;
-        }
     },
     async created() {
         const snapshots = await tracksCollection.get();
         snapshots.forEach((document) => this.addTrack(document));
     },
-    beforeRouteLeave(to, from, next) {
-        if(!this.unsavedFlag) {
-            next();
-        } else {
-            const leave = confirm("You have unsaved changes. Are you sure you want to leave?");
-            next(leave);
-        }
-    }
 };
 </script>
 
