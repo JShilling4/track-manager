@@ -1,9 +1,13 @@
 :root {
-    --color-primary: rgb(242, 95, 58);
-    --color-secondary: rgb(0,0,0);
+    --color-primary: rgb(73, 120, 250);
+    --color-secondary: rgb(24, 206, 238);
     --color-tertiary: rgba(0,0,0);
 
 
     --button-primary-bgcolor: var(--color-primary);
     --button-primary-color: #fff;
+
+    --input-height: 4rem;
+    --input-border-color: rgb(197, 197, 197);
+    --input-placeholder-color: rgba(51, 51, 51, 0.514);
 }
