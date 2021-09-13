@@ -24,7 +24,6 @@
                             :update-track="updateTrack"
                             :index="i"
                             :remove-track="removeTrack"
-                            :update-unsaved-flag="updateUnsavedFlag"
                         />
                     </div>
                 </div>
@@ -70,8 +69,8 @@ export default {
         },
     },
     async created() {
-        const snapshots = await tracksCollection.get();
-        snapshots.forEach((document) => this.addTrack(document));
+        const trackSnapshots = await tracksCollection.get();
+        trackSnapshots.forEach((document) => this.addTrack(document));
     },
 };
 </script>

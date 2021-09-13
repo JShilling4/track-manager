@@ -93,15 +93,7 @@
                     <multi-select
                         name="category"
                         v-model="localTrack.category"
-                        :options="[
-                            'Alternative/Grunge',
-                            'Outlaw Country',
-                            'Boutique',
-                            'Blues/Blues Rock',
-                            '90s Country',
-                            'Classic Rock',
-                            'Hard Rock'
-                        ]"
+                        :options="categories"
                         placeholder="Enter Category"
                     />
                 </input-group>
@@ -153,8 +145,12 @@
 </template>
 
 <script>
-import Multiselect from '@vueform/multiselect';
-import { tracksCollection, storage } from "@/includes/firebase";
+import Multiselect from "@vueform/multiselect";
+import {
+    tracksCollection,
+    categoriesCollection,
+    storage,
+} from "@/includes/firebase";
 import cloneDeep from "lodash/cloneDeep";
 
 export default {
@@ -188,6 +184,7 @@ export default {
             alertVariant: "nuetralColor",
             alertMessage: "Please wait while the track info is updated...",
             localTrack: {},
+            categories: [],
         };
     },
 
@@ -238,7 +235,12 @@ export default {
         },
     },
 
-    mounted() {
+    async mounted() {
+        const categorySnapshots = await categoriesCollection.get();
+
+        categorySnapshots.forEach((document) => {
+            this.categories.push(document.data().name);
+        });
         this.localTrack = cloneDeep(this.track);
         delete this.localTrack.docID;
     },
@@ -265,6 +267,4 @@ export default {
         }
     }
 }
-
-
 </style>
