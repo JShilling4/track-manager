@@ -1,7 +1,7 @@
 <template>
     <header class="header">
         <div>
-            <h1>Set List Manager</h1>
+            <h1>Band Manager</h1>
         </div>
 
         <nav
@@ -60,10 +60,9 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 18rem;
-    @include breakpoint(tablet-land) {
-        min-height: 10rem;
-    }
+    min-height: 10rem;
+    margin-bottom: 6rem;
+
     .logo {
         width: 15rem;
     }
