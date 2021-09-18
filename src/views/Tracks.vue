@@ -3,7 +3,7 @@
         <div class="content">
             <!-- Upload Area -->
             <div class="upload-container">
-                <track-upload :add-track="addTrack" />
+                <track-upload />
             </div>
 
             <!-- Uploaded List -->
@@ -11,20 +11,44 @@
                 <div class="mainList">
                     <!-- Header -->
                     <div class="mainList__header">
-                        <h2 class="heading">All Tracks</h2>
-                        <i class="fa fa-compact-disc icon"></i>
+                        <h2 class="heading">All Tracks ({{ tracks.length }})</h2>
                     </div>
 
                     <!-- List Items -->
                     <div class="mainList__item-container">
                         <track-item
-                            v-for="(track, i) in tracks"
+                            v-for="(track) in tracks"
                             :key="track.docID"
                             :track="track"
-                            :update-track="updateTrack"
-                            :index="i"
-                            :remove-track="removeTrack"
                         />
+                    </div>
+                </div>
+                <div
+                    v-for="(category) in categories"
+                    :key="category.id"
+                    class="mainList"
+                >
+                    <!-- Header -->
+                    <div class="mainList__header">
+                        <h2 class="heading">
+                            {{ category.name }}
+                            ({{ tracks.filter((t) => t.category === category.name).length }})
+                        </h2>
+                    </div>
+
+                    <!-- List Items -->
+                    <div class="mainList__item-container">
+                        <div
+                            v-for="(track) in tracks.filter((t) => t.category === category.name)"
+                            :key="track.docID"
+                        >
+                            <track-item :track="track" />
+
+                        </div>
+                        <p
+                            v-if="tracks.filter((t) => t.category === category.name).length < 1"
+                            class="emptyCategory"
+                        >No tracks in this category.</p>
                     </div>
                 </div>
             </div>
@@ -33,45 +57,29 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import TrackItem from "@/components/TrackItem.vue";
 import TrackUpload from "@/components/TrackUpload.vue";
-import { tracksCollection } from "@/includes/firebase";
 
 export default {
-    name: "ManagePage",
+    name: "TracksPage",
     components: {
         "track-upload": TrackUpload,
         "track-item": TrackItem,
     },
 
     data() {
-        return {
-            tracks: [],
-        };
+        return {};
     },
 
-    methods: {
-        updateTrack(i, values) {
-            this.tracks[i].modifiedName = values.modifiedName;
-            this.tracks[i].category = values.category;
-        },
-
-        removeTrack(i) {
-            this.tracks.splice(i, 1);
-        },
-
-        addTrack(document) {
-            const track = {
-                ...document.data(),
-                docID: document.id,
-            };
-            this.tracks.push(track);
-        },
+    computed: {
+        ...mapState({
+            categories: (state) => state.categories.categories,
+            tracks: (state) => state.tracks.tracks,
+        }),
     },
-    async created() {
-        const trackSnapshots = await tracksCollection.get();
-        trackSnapshots.forEach((document) => this.addTrack(document));
-    },
+
+    methods: {},
 };
 </script>
 
@@ -86,24 +94,23 @@ export default {
 
 .mainList-container {
     flex: 1;
-    margin-left: 4rem;
+    margin-left: 12rem;
 
     .mainList {
         &__header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: .5rem 2rem;
+            padding: 0.5rem 2rem;
             font-weight: bold;
             border: 2px solid gray;
-            .icon {
-                color: teal;
-                font-size: 2rem;
-            }
         }
 
         &__item-container {
             padding: 1rem;
+            .emptyCategory {
+                padding: 2rem 1rem;
+            }
         }
     }
 }

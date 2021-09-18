@@ -58,17 +58,11 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import { storage, tracksCollection } from "@/includes/firebase";
 
 export default {
     name: "Upload",
-    props: {
-        addTrack: {
-            type: Function,
-            required: true,
-        },
-    },
-
     data() {
         return {
             isDragover: false,
@@ -77,6 +71,8 @@ export default {
     },
 
     methods: {
+        ...mapActions(["addTrack"]),
+
         uploadSong(event) {
             this.isDragover = false;
 
@@ -122,6 +118,7 @@ export default {
                             originalName: task.snapshot.ref.name,
                             modifiedName: task.snapshot.ref.name,
                             category: "",
+                            lastUpdated: new Date().toISOString(),
                             key: "",
                             bpm: "",
                             referenceLink: "",

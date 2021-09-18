@@ -1,248 +1,103 @@
 <template>
     <div class="trackItem-wrapper">
         <!-- Track Name -->
-        <div
-            class="trackItem"
-            v-show="!showForm"
-        >
+        <div class="trackItem">
             <h4 class="trackItem__heading">
                 {{ track.artist ? `${track.artist} - ` : ''}} {{ track.modifiedName }}
+                <p class="lastUpdated">
+                    Last Updated: {{ $dayjs(track.lastUpdated).format('MM-DD-YYYY h:mma') }}
+                </p>
             </h4>
 
             <div class="trackItem__controls">
-                <button
-                    type="button"
-                    class=""
+                <i
+                    class="fa fa-trash-alt icon icon--delete"
                     @click.prevent="deleteTrack"
-                >
-                    <i class="fa fa-trash-alt"></i>
-                </button>
-                <button
-                    type="button"
-                    class=""
-                    @click.prevent="showForm = !showForm"
-                >
-                    <i class="fa fa-pencil-alt"></i>
-                </button>
+                ></i>
+                <i
+                    class="fa fa-pencil-alt icon icon--edit"
+                    @click.prevent="editModalShowing = !editModalShowing"
+                ></i>
+                <i
+                    class="fas fa-download icon icon--download"
+                    @click.prevent="downloadTrack"
+                ></i>
+                <i
+                    class="far fa-play-circle icon icon--play"
+                    @click.prevent="playTrack"
+                ></i>
             </div>
         </div>
 
-        <!-- Edit Form -->
-        <div v-show="showForm">
-            <!-- Alert Message -->
-            <div
-                v-if="showAlert"
-                class=""
-                :class="alertVariant"
-            >
-                {{ alertMessage }}
-            </div>
+        <edit-track-modal
+            :is-showing="editModalShowing"
+            :track="track"
+            @close="editModalShowing = false"
+        />
 
-            <form @submit.prevent="edit">
-                <!-- Title -->
-                <input-group>
-                    <form-label>Name</form-label>
-                    <text-input
-                        type="text"
-                        name="modifiedName"
-                        v-model="localTrack.modifiedName"
-                        class=""
-                        placeholder="Enter Name"
-                    />
-                </input-group>
-
-                <!-- Artist -->
-                <input-group>
-                    <form-label>Artist</form-label>
-                    <text-input
-                        type="text"
-                        name="artist"
-                        v-model="localTrack.artist"
-                        class=""
-                        placeholder="Enter Artist"
-                    />
-                </input-group>
-
-                <!-- Key -->
-                <input-group>
-                    <form-label>Key</form-label>
-                    <text-input
-                        type="text"
-                        name="key"
-                        v-model="localTrack.key"
-                        class=""
-                        placeholder="Enter Key"
-                    />
-                </input-group>
-
-                <!-- BPM -->
-                <input-group>
-                    <form-label>BPM</form-label>
-                    <text-input
-                        type="text"
-                        name="bpm"
-                        v-model="localTrack.bpm"
-                        class=""
-                        placeholder="Enter Name"
-                    />
-                </input-group>
-
-                <!-- Category -->
-                <input-group>
-                    <form-label>Category</form-label>
-                    <multi-select
-                        name="category"
-                        v-model="localTrack.category"
-                        :options="categories"
-                        placeholder="Enter Category"
-                    />
-                </input-group>
-
-                <!-- Reference -->
-                <input-group>
-                    <form-label>Reference Link</form-label>
-                    <text-input
-                        type="text"
-                        name="category"
-                        v-model="localTrack.referenceLink"
-                        class=""
-                        placeholder="Enter Reference Link"
-                    />
-                </input-group>
-
-                <!-- Notes -->
-                <input-group>
-                    <form-label>Notes</form-label>
-                    <textarea
-                        type="text"
-                        name="category"
-                        v-model="localTrack.notes"
-                        class=""
-                        placeholder="Enter Notes"
-                    />
-                </input-group>
-
-                <!-- Submit Form -->
-                <base-button
-                    type="submit"
-                    class=""
-                >
-                    Submit
-                </base-button>
-
-                <!-- Go Back -->
-                <base-button
-                    type="button"
-                    class=""
-                    :disabled="inSubmission"
-                    @click.prevent="showForm = false"
-                >
-                    Go Back
-                </base-button>
-            </form>
-        </div>
     </div>
 </template>
 
 <script>
-import Multiselect from "@vueform/multiselect";
-import {
-    tracksCollection,
-    categoriesCollection,
-    storage,
-} from "@/includes/firebase";
-import cloneDeep from "lodash/cloneDeep";
+import EditTrackModal from "./EditTrackModal.vue";
+import { storage } from "../includes/firebase";
 
 export default {
     name: "TrackItem",
     components: {
-        "multi-select": Multiselect,
+        "edit-track-modal": EditTrackModal,
     },
+
     props: {
         track: {
             type: Object,
             required: true,
         },
-        updateTrack: {
-            type: Function,
-            required: true,
-        },
-        removeTrack: {
-            type: Function,
-            required: true,
-        },
-        index: {
-            type: Number,
-            required: true,
-        },
     },
+
     data() {
         return {
-            showForm: false,
-            inSubmission: false,
-            showAlert: false,
-            alertVariant: "nuetralColor",
-            alertMessage: "Please wait while the track info is updated...",
-            localTrack: {},
-            categories: [],
+            editModalShowing: false,
         };
     },
 
-    watch: {
-        track() {
-            this.localTrack = cloneDeep(this.track);
-            delete this.localTrack.docID;
-        },
-    },
-
     methods: {
-        async edit() {
-            this.inSubmission = true;
-            this.showAlert = true;
-            this.alertVariant = "nuetralColor";
-            this.alertMessage =
-                "Please wait while the track info is updated...";
-
-            try {
-                await tracksCollection
-                    .doc(this.track.docID)
-                    .update(this.localTrack);
-            } catch (error) {
-                this.inSubmission = false;
-                this.alertVariant = "errorColor";
-                this.alertMessage =
-                    "Something went wrong! Please try again later.";
-            }
-
-            this.updateTrack(this.index, this.localTrack);
-
-            this.inSubmission = false;
-            this.alertVariant = "successColor";
-            this.alertMessage = "Track successfully updated!";
+        closeEditModal() {
+            this.editModalShowing = false;
         },
 
         async deleteTrack() {
-            const storageRef = storage.ref();
-            const trackRef = storageRef.child(
-                `tracks/${this.track.originalName}`
-            );
-
-            await trackRef.delete();
-
-            await tracksCollection.doc(this.track.docID).delete();
-
-            this.removeTrack(this.index);
+            this.$store.dispatch("removeTrack", this.track);
         },
-    },
 
-    async mounted() {
-        const categorySnapshots = await categoriesCollection.get();
+        async downloadTrack() {
+            const storageRef = storage.ref();
+            storageRef
+                .child(`tracks/${this.track.modifiedName}`)
+                .getDownloadURL()
+                .then((url) => {
+                    // `url` is the download URL for 'images/stars.jpg'
 
-        categorySnapshots.forEach((document) => {
-            this.categories.push(document.data().name);
-        });
-        this.localTrack = cloneDeep(this.track);
-        delete this.localTrack.docID;
+                    // This can be downloaded directly:
+                    const xhr = new XMLHttpRequest();
+                    xhr.responseType = "blob";
+                    xhr.onload = () => {
+                        const downloadUrl = URL.createObjectURL(xhr.response);
+                        const a = document.createElement("a");
+                        document.body.appendChild(a);
+                        a.style = "display: none";
+                        a.href = downloadUrl;
+                        a.download = "";
+                        a.click();
+                    };
+                    xhr.open("GET", url);
+                    xhr.send();
+                })
+                .catch((error) => {
+                    // Handle any errors
+                    console.log(error);
+                });
+        },
     },
 };
 </script>
@@ -253,17 +108,19 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 2rem 1rem;
-    border-bottom: 1px solid gray;
+    /* border-bottom: 1px solid gray; */
     &__heading {
         color: #333;
+        .lastUpdated {
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
     }
 
     &__controls {
-        button {
+        display: flex;
+        .icon {
             margin: 0 1rem;
-            height: 3rem;
-            width: 3rem;
-            cursor: pointer;
         }
     }
 }
