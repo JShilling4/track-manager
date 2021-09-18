@@ -1,6 +1,6 @@
 <template>
     <TheNavbar
-        class="outer-container"
+        class="container"
         :show-mobile-menu="showMobileMenu || windowWidth > 768"
         @open="showMobileMenu = true"
         @close="showMobileMenu = false"
@@ -9,23 +9,34 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import TheNavbar from "@/components/TheNavbar.vue";
 
 export default {
     components: {
         TheNavbar,
     },
+
     data() {
         return {
             showMobileMenu: false,
             windowWidth: document.documentElement.clientWidth,
         };
     },
+
     methods: {
+        ...mapActions(["fetchCategories", "fetchTracks"]),
+
         getWindowWidth() {
             this.windowWidth = document.documentElement.clientWidth;
         },
     },
+
+    async created() {
+        this.fetchCategories();
+        this.fetchTracks();
+    },
+
     mounted() {
         this.$nextTick(() => {
             window.addEventListener("resize", this.getWindowWidth);
@@ -56,8 +67,33 @@ export default {
 }
 .successColor {
     color: rgb(14, 211, 119);
+    font-weight: 600;
 }
 .neutralColor {
     color: rgb(65, 130, 252);
+}
+
+.icon {
+    border-radius: 5px;
+    height: 3rem;
+    width: 3rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+
+    &--delete {
+        background-color: var(--color-red);
+    }
+    &--edit {
+        background-color: var(--color-primary);
+    }
+    &--download {
+        background-color: var(--color-download);
+    }
+    &--play {
+        background-color: var(--color-play);
+    }
 }
 </style>
