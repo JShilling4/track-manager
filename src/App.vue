@@ -1,20 +1,23 @@
 <template>
-    <TheNavbar
+    <the-navbar
         class="container"
         :show-mobile-menu="showMobileMenu || windowWidth > 768"
         @open="showMobileMenu = true"
         @close="showMobileMenu = false"
     />
     <router-view />
+    <music-player />
 </template>
 
 <script>
 import { mapActions } from "vuex";
 import TheNavbar from "@/components/TheNavbar.vue";
+import MusicPlayer from "@/components/MusicPlayer.vue";
 
 export default {
     components: {
-        TheNavbar,
+        "the-navbar": TheNavbar,
+        "music-player": MusicPlayer,
     },
 
     data() {
@@ -59,7 +62,11 @@ export default {
 .multiselect {
     --ms-font-size: 1.6rem;
     --ms-option-font-size: 1.4rem;
+    --ms-max-height: 18rem;
     height: var(--input-height);
+    &-dropdown {
+        max-height: 18rem;
+    }
 }
 
 .errorColor {
