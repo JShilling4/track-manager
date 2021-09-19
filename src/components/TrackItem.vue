@@ -3,7 +3,7 @@
         <!-- Track Name -->
         <div class="trackItem">
             <h4 class="trackItem__heading">
-                {{ track.artist ? `${track.artist} - ` : ''}} {{ track.modifiedName }}
+                <span class="artist">{{ track.artist ? `${track.artist} - ` : ''}}</span> {{ track.modifiedName }}
                 <p class="lastUpdated">
                     Last Updated: {{ $dayjs(track.lastUpdated).format('MM-DD-YYYY h:mma') }}
                 </p>
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import EditTrackModal from "./EditTrackModal.vue";
 import { storage } from "../includes/firebase";
 
@@ -62,6 +63,8 @@ export default {
     },
 
     methods: {
+        ...mapActions(["newSong"]),
+
         closeEditModal() {
             this.editModalShowing = false;
         },
@@ -98,6 +101,10 @@ export default {
                     console.log(error);
                 });
         },
+
+        playTrack() {
+            this.newSong(this.track);
+        },
     },
 };
 </script>
@@ -107,13 +114,15 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem 1rem;
-    /* border-bottom: 1px solid gray; */
+    padding: 1.5rem 1rem;
     &__heading {
         color: #333;
         .lastUpdated {
             font-size: 1.2rem;
             font-weight: 400;
+        }
+        .artist {
+            color: rgb(150, 150, 150);
         }
     }
 

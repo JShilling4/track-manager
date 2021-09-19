@@ -8,49 +8,35 @@
 
             <!-- Uploaded List -->
             <div class="mainList-container">
+                <div class="categoryFilter">
+                    <multi-select
+                        name="category"
+                        label="name"
+                        value-prop="name"
+                        v-model="selectedCategory"
+                        :options="categoriesFilterList"
+                        placeholder="Enter Category"
+                    />
+                </div>
                 <div class="mainList">
                     <!-- Header -->
                     <div class="mainList__header">
-                        <h2 class="heading">All Tracks ({{ tracks.length }})</h2>
-                    </div>
-
-                    <!-- List Items -->
-                    <div class="mainList__item-container">
-                        <track-item
-                            v-for="(track) in tracks"
-                            :key="track.docID"
-                            :track="track"
-                        />
-                    </div>
-                </div>
-                <div
-                    v-for="(category) in categories"
-                    :key="category.id"
-                    class="mainList"
-                >
-                    <!-- Header -->
-                    <div class="mainList__header">
-                        <h2 class="heading">
-                            {{ category.name }}
-                            ({{ tracks.filter((t) => t.category === category.name).length }})
-                        </h2>
+                        <h2 class="heading">{{ selectedCategory }} ({{ selectedTracks.length }})</h2>
                     </div>
 
                     <!-- List Items -->
                     <div class="mainList__item-container">
                         <div
-                            v-for="(track) in tracks.filter((t) => t.category === category.name)"
+                            v-for="(track) in selectedTracks"
                             :key="track.docID"
+                            class="track-container"
                         >
                             <track-item :track="track" />
-
+                            <hr />
                         </div>
-                        <p
-                            v-if="tracks.filter((t) => t.category === category.name).length < 1"
-                            class="emptyCategory"
-                        >No tracks in this category.</p>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
@@ -60,16 +46,20 @@
 import { mapState } from "vuex";
 import TrackItem from "@/components/TrackItem.vue";
 import TrackUpload from "@/components/TrackUpload.vue";
+import Multiselect from "@vueform/multiselect";
 
 export default {
     name: "TracksPage",
     components: {
         "track-upload": TrackUpload,
         "track-item": TrackItem,
+        "multi-select": Multiselect,
     },
 
     data() {
-        return {};
+        return {
+            selectedCategory: "All",
+        };
     },
 
     computed: {
@@ -77,6 +67,20 @@ export default {
             categories: (state) => state.categories.categories,
             tracks: (state) => state.tracks.tracks,
         }),
+        categoriesFilterList() {
+            let list = this.categories.map((category) => {
+                return category.name;
+            });
+            list.push("All");
+            return list;
+        },
+        selectedTracks() {
+            return this.selectedCategory === "All"
+                ? this.tracks
+                : this.tracks.filter(
+                      (track) => track.category === this.selectedCategory
+                  );
+        },
     },
 
     methods: {},
@@ -86,6 +90,7 @@ export default {
 <style lang="scss" scoped>
 .content {
     display: flex;
+    padding-bottom: 8rem;
 }
 
 .upload-container {
@@ -95,7 +100,10 @@ export default {
 .mainList-container {
     flex: 1;
     margin-left: 12rem;
-
+    .categoryFilter {
+        margin-bottom: 2rem;
+        width: 25rem;
+    }
     .mainList {
         &__header {
             display: flex;

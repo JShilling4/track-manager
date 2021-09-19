@@ -83,7 +83,7 @@ export default {
                 if (file.type !== "audio/mpeg") {
                     return;
                 }
-                const fileName = file.name.split('.').slice(0, -1).join('.');
+                const fileName = file.name.split(".").slice(0, -1).join(".");
                 const storageRef = storage.ref(); // music-hub-d0bcb.appspot.com
                 const tracksRef = storageRef.child(`tracks/${fileName}`); // music-hub-d0bcb.appspot.com/songs/example.mp3
                 const task = tracksRef.put(file);
@@ -122,7 +122,7 @@ export default {
                             key: "",
                             bpm: "",
                             referenceLink: "",
-                            notes: ""
+                            notes: "",
                         };
 
                         track.url = await task.snapshot.ref.getDownloadURL();
@@ -161,7 +161,7 @@ export default {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: .5rem 2rem;
+        padding: 0.5rem 2rem;
         font-weight: bold;
         border-bottom: 2px solid gray;
 
@@ -181,7 +181,7 @@ export default {
             text-align: center;
             cursor: pointer;
             border: 2px dashed gray;
-            transition: all .5s;
+            transition: all 0.5s;
             &:hover {
                 color: #fff;
                 background-color: var(--color-primary);
@@ -195,6 +195,30 @@ export default {
         .hr {
             margin: 3rem 0;
         }
+
+        .progress-bar {
+            background-size: 1rem 1rem;
+            background-image: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.15) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.15) 50%,
+                rgba(255, 255, 255, 0.15) 75%,
+                transparent 75%,
+                transparent
+            );
+            animation: progress-bar-stripes 1s linear infinite;
+        }
+    }
+}
+
+@keyframes progress-bar-stripes {
+    0% {
+        background-position: 1rem 0;
+    }
+    100% {
+        background-position: 0 0;
     }
 }
 </style>
