@@ -111,6 +111,9 @@ export default {
         margin-left: 28px;
         margin-top: 8px;
         line-height: 12px;
+        @include breakpoint(tablet-land) {
+            width: calc(100% - 20rem);
+        }
 
         .scrub-container {
             position: relative;
@@ -143,12 +146,17 @@ export default {
         .track-info {
             position: absolute;
             color: #fff;
+
             top: 12px;
             left: 0;
             right: 0;
             text-align: center;
             margin: -24px auto 0;
-            width: calc(100% - 250px);
+            width: calc(100% - 25rem);
+            @include breakpoint(tablet-land) {
+                width: calc(100% - 20rem);
+                font-size: 1.2rem;
+            }
         }
     }
 

@@ -91,15 +91,25 @@ export default {
 .content {
     display: flex;
     padding-bottom: 8rem;
+    @include breakpoint(tablet-land) {
+        flex-wrap: wrap;
+    }
 }
 
 .upload-container {
     width: 30%;
+    @include breakpoint(tablet-land) {
+        width: 100%;
+        order: 2;
+    }
 }
 
 .mainList-container {
     flex: 1;
     margin-left: 12rem;
+    @include breakpoint(tablet-land) {
+        margin-left: 0;
+    }
     .categoryFilter {
         margin-bottom: 2rem;
         width: 25rem;
@@ -116,6 +126,9 @@ export default {
 
         &__item-container {
             padding: 1rem;
+            @include breakpoint(tablet-port) {
+                padding: 1rem 0;
+            }
             .emptyCategory {
                 padding: 2rem 1rem;
             }

@@ -115,6 +115,9 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem 1rem;
+    @include breakpoint(tablet-port) {
+        padding: 1rem 0;
+    }
     &__heading {
         color: #333;
         .lastUpdated {

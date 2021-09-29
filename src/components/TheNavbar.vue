@@ -62,6 +62,9 @@ export default {
     justify-content: space-between;
     min-height: 10rem;
     margin-bottom: 6rem;
+    @include breakpoint(tablet-land) {
+        margin-bottom: 2rem;
+    }
 
     .logo {
         width: 15rem;
@@ -105,7 +108,7 @@ export default {
             &.router-link-active:after {
                 position: absolute;
                 left: 0;
-                bottom: -.5rem;
+                bottom: -0.5rem;
                 content: "";
                 height: 2px;
                 width: 100%;
