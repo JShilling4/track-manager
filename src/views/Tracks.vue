@@ -1,5 +1,6 @@
 <template>
     <section class="page-wrapper container">
+        <h2>Tracks</h2>
         <div class="content">
             <!-- Upload Area -->
             <div class="upload-container">
@@ -88,6 +89,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h2 {
+    margin-bottom: 2rem;
+}
 .content {
     display: flex;
     padding-bottom: 8rem;

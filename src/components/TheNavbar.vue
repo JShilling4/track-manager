@@ -63,7 +63,7 @@ export default {
     align-items: center;
     justify-content: space-between;
     min-height: 10rem;
-    margin-bottom: 6rem;
+    margin-bottom: 3rem;
     @include breakpoint(tablet-land) {
         margin-bottom: 2rem;
     }

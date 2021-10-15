@@ -1,6 +1,6 @@
 <template>
-    <div class="page-wrapper">
-        Calendar
+    <div class="page-wrapper container">
+        <h2>Calendar</h2>
     </div>
 </template>
 
