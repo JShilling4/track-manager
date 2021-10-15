@@ -11,35 +11,37 @@
             <router-link
                 to="/"
                 class="nav-item"
+                @click="$emit('close')"
             >Home</router-link>
             <router-link
                 to="/tracks"
                 class="nav-item"
+                @click="$emit('close')"
             >Tracks</router-link>
             <router-link
                 to="/lists"
                 class="nav-item"
+                @click="$emit('close')"
             >Lists</router-link>
             <router-link
                 to="/calendar"
                 class="nav-item"
+                @click="$emit('close')"
             >Calendar</router-link>
         </nav>
 
-        <img
+        <i
             v-if="showMobileMenu"
-            src="@/assets/images/icon-close.svg"
             alt="close mobile menu icon"
             @click="$emit('close')"
-            class="mobileClose"
-        >
-        <img
+            class="fas fa-times mobileClose"
+        ></i>
+        <i
             v-else
-            src="@/assets/images/icon-hamburger.svg"
             alt="mobile menu icon"
             @click="$emit('open')"
-            class="hamburger"
-        >
+            class="fas fa-bars hamburger"
+        ></i>
     </header>
 </template>
 
@@ -72,11 +74,12 @@ export default {
     .nav {
         @include breakpoint(tablet-land) {
             position: absolute;
+            z-index: 100;
             display: flex;
             flex-direction: column;
             background-color: #fff;
-            width: 85%;
-            top: 12rem;
+            width: 100%;
+            top: 0;
             padding: 4rem 2rem;
             left: 50%;
             transform: translateX(-50%);
@@ -113,6 +116,12 @@ export default {
                 height: 2px;
                 width: 100%;
                 background-color: var(--color-primary);
+                @include breakpoint(tablet-land) {
+                    width: 50%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    bottom: 0;
+                }
             }
         }
     }
@@ -120,6 +129,10 @@ export default {
         @include breakpoint(laptop) {
             display: none;
         }
+    }
+    .hamburger, .mobileClose {
+        font-size: 3rem;
+        z-index: 101;
     }
     .hamburger {
         display: none;
