@@ -1,4 +1,4 @@
-import { formatTime } from "@/includes/helpers";
+import { formatTime } from "@/includes/helpers.ts";
 import { Howl } from "howler";
 
 export default {

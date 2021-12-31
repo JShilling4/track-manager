@@ -1,4 +1,4 @@
-export const formatTime = (time) => {
+export const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60) || 0;
     const seconds = Math.round(time - minutes * 60 || 0);
 

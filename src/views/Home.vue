@@ -1,22 +1,15 @@
 <template>
-    <div class="home">
-        <div class="content">
+  <div class="home">
 
-        </div>
-    </div>
+  </div>
 </template>
 
-<script>
-export default {
-    name: "HomePage",
-    components: {},
-};
-</script>
+<script lang="ts">
+import { Options, Vue } from 'vue-class-component';
 
-<style lang="scss" scoped>
-.content {
-    height: 100vh;
-    padding: 6rem 0;
-    background-color: var(--color-primary);
-}
-</style>
+@Options({
+  components: {
+  },
+})
+export default class Home extends Vue {}
+</script>
