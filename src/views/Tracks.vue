@@ -81,11 +81,13 @@ export default class TracksPage extends Vue {
   private categories: CategoryDto[] = [];
   private tracks: TrackDto[] = [];
 
+  // lifecycle hooks
   async created(): Promise<void> {
     this.tracks = await this.tracksRepository.getAll();
     this.categories = await this.categoriesRepository.getAll();
   }
 
+  // methods
   playTrack(track: TrackDto): void {
     const musicPlayerRef = this.$refs.musicPlayerRef as InstanceType<
       typeof MusicPlayer
@@ -98,37 +100,38 @@ export default class TracksPage extends Vue {
     this.tracks.splice(trackIndex, 1);
   }
 
-  addTrack(document: any): void {
-    // TODO: query track with snapshot, add docID
-    console.log(document);
+  addTrack(
+    document: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>
+  ): void {
     const {
-        artist,
-        bpm,
-        category,
-        key,
-        lastUpdated,
-        modifiedName,
-        notes,
-        originalName,
-        referenceLink,
-        url
-      } = document.data();
+      artist,
+      bpm,
+      category,
+      key,
+      lastUpdated,
+      modifiedName,
+      notes,
+      originalName,
+      referenceLink,
+      url
+    } = document.data();
 
-      this.tracks.push({
-        docID: document.id,
-        artist,
-        bpm,
-        category,
-        key,
-        lastUpdated,
-        modifiedName,
-        notes,
-        originalName,
-        referenceLink,
-        url
-      });
+    this.tracks.push({
+      docID: document.id,
+      artist,
+      bpm,
+      category,
+      key,
+      lastUpdated,
+      modifiedName,
+      notes,
+      originalName,
+      referenceLink,
+      url
+    });
   }
 
+  // computed
   get categoriesFilterList(): string[] {
     let list = this.categories.map((category) => {
       return category.name;

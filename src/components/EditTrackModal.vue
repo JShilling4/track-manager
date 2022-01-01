@@ -126,86 +126,89 @@
     </template>
   </base-modal>
 </template>
-<script>
-import { mapActions } from "vuex";
+<script lang="ts">
 import Multiselect from "@vueform/multiselect";
 import cloneDeep from "lodash/cloneDeep";
+import { Options, Vue } from "vue-class-component";
+import { Prop, Watch } from "vue-property-decorator";
+import { CategoryDto, TrackDto } from "@/types";
 
-export default {
+@Options({
   components: {
     "multi-select": Multiselect
-  },
+  }
+})
+export default class EditTrackModal extends Vue {
 
-  props: {
-    isShowing: {
-      type: Boolean
-    },
+  @Prop({
+    type: Boolean,
+    default: false
+  })
+  isShowing!: boolean;
 
-    track: {
-      type: Object
-    }
-  },
+  @Prop({
+    type: Object,
+  })
+  track?: TrackDto;
 
-  data() {
-    return {
-      localTrack: {},
-      inSubmission: false,
-      showAlert: false,
-      alertVariant: "nuetralColor",
-      alertMessage: "Please wait while the track info is updated..."
-    };
-  },
+  @Prop({
+    type: Array
+  })
+  categories?: CategoryDto[];
 
-  computed: {
-    categories() {
-      return this.$store.state.categories.categories;
-    }
-  },
+  private localTrack: TrackDto = new TrackDto();
+  private inSubmission = false;
+  private showAlert = false;
+  private alertVariant = "nuetralColor";
+  private alertMessage = "Please wait while the track info is updated...";
 
-  watch: {
-    track() {
+  @Watch("track")
+  onTrackChanged(): void {
+    if(this.track) {
       this.localTrack = cloneDeep(this.track);
       delete this.localTrack.docID;
     }
-  },
-
-  methods: {
-    ...mapActions(["updateTrack"]),
-
-    setLocalCategory(value) {
-      this.localTrack.category = value;
-    },
-
-    async edit() {
-      this.inSubmission = true;
-      this.showAlert = true;
-      this.alertVariant = "nuetralColor";
-      this.alertMessage = "Please wait while the track info is updated...";
-      // update the lastUpdated property
-      this.localTrack.lastUpdated = new Date().toISOString();
-      const success = await this.updateTrack({
-        id: this.track.docID,
-        track: this.localTrack
-      });
-
-      if (success) {
-        this.inSubmission = false;
-        this.alertVariant = "successColor";
-        this.alertMessage = "Track successfully updated!";
-      } else {
-        this.inSubmission = false;
-        this.alertVariant = "errorColor";
-        this.alertMessage = "Something went wrong! Please try again later.";
-      }
-      this.editModalShowing = false;
-    }
-  },
-
-  mounted() {
-    this.localTrack = cloneDeep(this.track);
   }
-};
+
+  setLocalCategory(value: string): void {
+    this.localTrack.category = value;
+  }
+
+  async edit(): Promise<void> {
+    this.inSubmission = true;
+    this.showAlert = true;
+    this.alertVariant = "nuetralColor";
+    this.alertMessage = "Please wait while the track info is updated...";
+    // update the lastUpdated property
+    this.localTrack.lastUpdated = new Date().toISOString();
+
+    // TODO: add repository code to update a track in place
+    // const success = await this.updateTrack({
+    //   id: this.track.docID,
+    //   track: this.localTrack
+    // });
+
+    // if (success) {
+    //   this.inSubmission = false;
+    //   this.alertVariant = "successColor";
+    //   this.alertMessage = "Track successfully updated!";
+    // } else {
+    //   this.inSubmission = false;
+    //   this.alertVariant = "errorColor";
+    //   this.alertMessage = "Something went wrong! Please try again later.";
+    // }
+    // TODO: emit to parent?
+    // this.editModalShowing = false;
+  }
+
+  mounted(): void {
+    if (this.track) {
+      this.localTrack = cloneDeep(this.track);
+    }
+  }
+}
 </script>
+
 <style lang="scss">
 .alertMessage {
   font-size: 2rem;

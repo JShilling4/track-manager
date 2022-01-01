@@ -40,6 +40,16 @@ export class TracksRepository implements ITracksRepository {
     return tracks;
   }
 
+  public async update(track: TrackDto): Promise<void> {
+    try {
+      return await tracksCollection
+        .doc(track.docID)
+        .update(track)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   public async delete(track: TrackDto): Promise<void> {
     const storageRef = storage.ref();
     const trackRef = storageRef.child(`tracks/${track.originalName}`);

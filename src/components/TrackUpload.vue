@@ -19,14 +19,14 @@
         @dragover.prevent.stop="isDragover = true"
         @dragenter.prevent.stop="isDragover = true"
         @dragleave.prevent.stop="isDragover = false"
-        @drop.prevent.stop="uploadSong($event)"
+        @drop.prevent.stop="onFileDrop($event)"
       >
         <h5>Drop your files here</h5>
       </div>
       <input
         type="file"
         multiple
-        @change="uploadSong($event)"
+        @change="onFileChange($event)"
       />
       <hr class="hr" />
 
@@ -70,15 +70,26 @@ export default class TrackUpload extends Vue {
   private isDragover = false;
   private uploads: ITrackUpload[] = [];
 
-  uploadSong(event: Event): void {
-    const e = event as InputEvent;
-    this.isDragover = false;
+  onFileChange(e: Event): void {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files.length) {
+      let files = [...target.files];
+      this.uploadSongs(files);
+    }
 
-    const files = e.dataTransfer
-      ? [...e.dataTransfer.files]
-      : [(e.target as HTMLInputElement).files];
-    files.forEach((file) => {
-      if (file instanceof File) {
+  }
+
+  onFileDrop(e: DragEvent): void {
+    this.isDragover = false;
+    if (e.dataTransfer) {
+      const files = [...e.dataTransfer.files];
+      this.uploadSongs(files);
+    }
+  }
+
+  uploadSongs(files: File[]): void {
+    if (files) {
+      files.forEach((file: File) => {
         if (file.type !== "audio/mpeg") {
           return;
         }
@@ -122,7 +133,7 @@ export default class TrackUpload extends Vue {
               referenceLink: "",
               notes: "",
               docID: "",
-              url: "",
+              url: ""
             };
 
             track.url = await task.snapshot.ref.getDownloadURL();
@@ -136,8 +147,8 @@ export default class TrackUpload extends Vue {
             this.uploads[uploadIndex].textClass = "successColor";
           }
         );
-      }
-    });
+      });
+    }
   }
 
   beforeUnmount(): void {
