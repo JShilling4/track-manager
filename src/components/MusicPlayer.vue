@@ -18,18 +18,30 @@
 
       <!-- Scrub -->
       <div class="player-scrub">
-        <div v-if="currentSong.modifiedName" class="track-info">
+        <div
+          v-if="currentSong.modifiedName"
+          class="track-info"
+        >
           <span class="song-title">{{ currentSong.artist }} - </span>
           <span class="song-artist">{{ currentSong.modifiedName }}</span>
         </div>
         <!-- Scrub Container  -->
-        <span class="scrub-container" @click.prevent="updateSeek">
+        <span
+          class="scrub-container"
+          @click.prevent="updateSeek"
+        >
           <!-- Player Ball -->
-          <span class="playerBall" :style="{ left: playerProgress }">
+          <span
+            class="playerBall"
+            :style="{ left: playerProgress }"
+          >
             <i class="fas fa-circle"></i>
           </span>
           <!-- Player Progress Bar-->
-          <span class="scrubBar" :style="{ width: playerProgress }"></span>
+          <span
+            class="scrubBar"
+            :style="{ width: playerProgress }"
+          ></span>
         </span>
       </div>
 
@@ -41,26 +53,107 @@
   </div>
 </template>
 
-<script>
-import { mapActions, mapGetters, mapState } from "vuex";
+<script lang="ts">
+import { Options, Vue } from "vue-class-component";
+import { formatTime } from "@/includes/helpers";
+import { Howl } from "howler";
+import { TrackDto } from "@/types";
 
-export default {
-  name: "MusicPlayer",
+@Options({
+  name: "MusicPlayer"
+})
+export default class MusicPlayer extends Vue {
+  private currentSong: TrackDto | null = new TrackDto();
+  private sound: Howl | null = null;
+  private seek = "00:00";
+  private duration = "00:00";
+  private playerProgress = "0%";
 
-  computed: {
-    ...mapGetters(["playing"]),
-    ...mapState({
-      seek: (state) => state.playerVuexModule.seek,
-      duration: (state) => state.playerVuexModule.duration,
-      playerProgress: (state) => state.playerVuexModule.playerProgress,
-      currentSong: (state) => state.playerVuexModule.currentSong,
-    }),
-  },
+  toggleAudio(): void {
+    if (!this.sound?.playing) {
+      return;
+    }
 
-  methods: {
-    ...mapActions(["toggleAudio", "updateSeek"]),
-  },
-};
+    this.sound.playing() ? this.sound.pause() : this.sound.play();
+  }
+
+  updatePosition(): void {
+    if (this.sound) {
+      this.seek = formatTime(this.sound.seek());
+      this.duration = formatTime(this.sound.duration());
+      this.playerProgress = `${
+        (this.sound.seek() / this.sound.duration()) * 100
+      }%`;
+    }
+  }
+
+  updateSeek(e: MouseEvent): void {
+    const element = e.currentTarget as HTMLElement;
+
+    if (!this.sound?.playing()) {
+      return;
+    }
+    const { x, width } = element.getBoundingClientRect();
+    const clickX = e.clientX - x;
+    const percentage = clickX / width;
+    const seconds = this.sound.duration() * percentage;
+
+    this.sound.seek(seconds);
+    this.sound.once("seek", () => {
+      this.progress();
+    });
+  }
+
+  newSong(payload: TrackDto): void {
+    if (this.sound instanceof Howl) {
+      this.sound.unload();
+    }
+
+    this.currentSong = payload;
+    this.sound = new Howl({
+      src: [payload.url],
+      html5: true
+    });
+
+    if (this.sound) {
+      this.sound.play();
+      // update track progress bar as track plays
+      this.sound.on("play", () => {
+        requestAnimationFrame(() => {
+          this.updatePosition();
+          if (this.sound?.playing()) {
+            requestAnimationFrame(() => {
+              this.progress();
+            });
+          }
+        });
+      });
+    }
+  }
+
+  progress(): void {
+    this.updatePosition();
+
+    if (this.sound?.playing()) {
+      requestAnimationFrame(() => {
+        this.progress();
+      });
+    }
+  }
+
+  get playing(): boolean {
+    if (this.sound?.playing) {
+      return this.sound.playing();
+    }
+    return false;
+  }
+
+  playTrack(): void {
+    if (this.sound) {
+      this.sound.play();
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -4,7 +4,7 @@
     <div class="content">
       <!-- Upload Area -->
       <div class="upload-container">
-        <track-upload />
+        <track-upload @upload="addTrack" />
       </div>
 
       <!-- Uploaded List -->
@@ -34,7 +34,11 @@
               :key="track.docID"
               class="track-container"
             >
-              <track-item :track="track" />
+              <track-item
+                :track="track"
+                @play="playTrack(track)"
+                @delete="removeTrack(track)"
+              />
               <hr />
             </div>
           </div>
@@ -42,6 +46,7 @@
       </div>
     </div>
   </section>
+  <music-player ref="musicPlayerRef" />
 </template>
 
 <script lang="ts">
@@ -56,13 +61,16 @@ import {
   ICategoriesRepository
 } from "@/types";
 import { inject } from "inversify-props";
+import MusicPlayer from "@/components/MusicPlayer.vue";
+import firebase from "firebase/app";
 
 @Options({
   name: "TracksPage",
   components: {
     "track-upload": TrackUpload,
     "track-item": TrackItem,
-    "multi-select": Multiselect
+    "multi-select": Multiselect,
+    "music-player": MusicPlayer
   }
 })
 export default class TracksPage extends Vue {
@@ -78,6 +86,49 @@ export default class TracksPage extends Vue {
     this.categories = await this.categoriesRepository.getAll();
   }
 
+  playTrack(track: TrackDto): void {
+    const musicPlayerRef = this.$refs.musicPlayerRef as InstanceType<
+      typeof MusicPlayer
+    >;
+    musicPlayerRef.newSong(track);
+  }
+
+  removeTrack(track: TrackDto): void {
+    const trackIndex = this.tracks.findIndex((t) => t.docID === track.docID);
+    this.tracks.splice(trackIndex, 1);
+  }
+
+  addTrack(document: any): void {
+    // TODO: query track with snapshot, add docID
+    console.log(document);
+    const {
+        artist,
+        bpm,
+        category,
+        key,
+        lastUpdated,
+        modifiedName,
+        notes,
+        originalName,
+        referenceLink,
+        url
+      } = document.data();
+
+      this.tracks.push({
+        docID: document.id,
+        artist,
+        bpm,
+        category,
+        key,
+        lastUpdated,
+        modifiedName,
+        notes,
+        originalName,
+        referenceLink,
+        url
+      });
+  }
+
   get categoriesFilterList(): string[] {
     let list = this.categories.map((category) => {
       return category.name;
@@ -85,6 +136,7 @@ export default class TracksPage extends Vue {
     list.push("All");
     return list;
   }
+
   get selectedTracks(): TrackDto[] {
     return this.selectedCategory === "All"
       ? this.tracks

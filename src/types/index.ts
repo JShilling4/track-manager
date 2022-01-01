@@ -1,3 +1,5 @@
+// Interfaces
+export * from "./ITrackUpload";
 // Repositories
 export * from "./ICategoriesRepository";
 export * from "./ITracksRepository";

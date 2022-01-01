@@ -11,7 +11,11 @@
       <!-- Edit Form -->
       <div>
         <!-- Alert Message -->
-        <div v-if="showAlert" class="alertMessage" :class="alertVariant">
+        <div
+          v-if="showAlert"
+          class="alertMessage"
+          :class="alertVariant"
+        >
           {{ alertMessage }}
         </div>
 
@@ -103,7 +107,10 @@
           </input-group>
 
           <!-- Submit Form -->
-          <base-button type="submit" class=""> Submit </base-button>
+          <base-button
+            type="submit"
+            class=""
+          > Submit </base-button>
 
           <!-- Go Back -->
           <base-button
@@ -126,17 +133,17 @@ import cloneDeep from "lodash/cloneDeep";
 
 export default {
   components: {
-    "multi-select": Multiselect,
+    "multi-select": Multiselect
   },
 
   props: {
     isShowing: {
-      type: Boolean,
+      type: Boolean
     },
 
     track: {
-      type: Object,
-    },
+      type: Object
+    }
   },
 
   data() {
@@ -145,21 +152,21 @@ export default {
       inSubmission: false,
       showAlert: false,
       alertVariant: "nuetralColor",
-      alertMessage: "Please wait while the track info is updated...",
+      alertMessage: "Please wait while the track info is updated..."
     };
   },
 
   computed: {
     categories() {
       return this.$store.state.categories.categories;
-    },
+    }
   },
 
   watch: {
     track() {
       this.localTrack = cloneDeep(this.track);
       delete this.localTrack.docID;
-    },
+    }
   },
 
   methods: {
@@ -178,7 +185,7 @@ export default {
       this.localTrack.lastUpdated = new Date().toISOString();
       const success = await this.updateTrack({
         id: this.track.docID,
-        track: this.localTrack,
+        track: this.localTrack
       });
 
       if (success) {
@@ -191,12 +198,12 @@ export default {
         this.alertMessage = "Something went wrong! Please try again later.";
       }
       this.editModalShowing = false;
-    },
+    }
   },
 
   mounted() {
     this.localTrack = cloneDeep(this.track);
-  },
+  }
 };
 </script>
 <style lang="scss">

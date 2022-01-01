@@ -6,34 +6,34 @@ export default {
   },
 
   mutations: {
-    ADD_TRACK(state, track) {
-      state.tracks.push(track);
-    },
+    // ADD_TRACK(state, track) {
+    //   state.tracks.push(track);
+    // },
 
-    UPDATE_TRACK(state, payload) {
-      const { trackIndex, track } = payload;
-      state.tracks[trackIndex] = track;
-    },
+    // UPDATE_TRACK(state, payload) {
+    //   const { trackIndex, track } = payload;
+    //   state.tracks[trackIndex] = track;
+    // },
 
-    REMOVE_TRACK(state, trackIndex) {
-      state.tracks.splice(trackIndex, 1);
-    }
+    // REMOVE_TRACK(state, trackIndex) {
+    //   state.tracks.splice(trackIndex, 1);
+    // }
   },
 
   actions: {
-    fetchTracks({ dispatch }) {
-      tracksCollection.get().then((trackSnapshots) => {
-        trackSnapshots.forEach((document) => dispatch("addTrack", document));
-      });
-    },
+    // fetchTracks({ dispatch }) {
+    //   tracksCollection.get().then((trackSnapshots) => {
+    //     trackSnapshots.forEach((document) => dispatch("addTrack", document));
+    //   });
+    // },
 
-    addTrack({ commit }, document) {
-      const track = {
-        ...document.data(),
-        docID: document.id
-      };
-      commit("ADD_TRACK", track);
-    },
+    // addTrack({ commit }, document) {
+    //   const track = {
+    //     ...document.data(),
+    //     docID: document.id
+    //   };
+    //   commit("ADD_TRACK", track);
+    // },
 
     updateTrack({ commit, getters }, payload) {
       const { id, track } = payload;

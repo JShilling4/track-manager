@@ -12,25 +12,22 @@
         to="/"
         class="nav-item"
         @click="$emit('close')"
-      >Home
+      >
+        Home
       </router-link>
       <router-link
         to="/tracks"
         class="nav-item"
         @click="$emit('close')"
-      >Tracks
+      >
+        Tracks
       </router-link>
       <router-link
         to="/lists"
         class="nav-item"
         @click="$emit('close')"
-      >Lists
-      </router-link>
-      <router-link
-        to="/calendar"
-        class="nav-item"
-        @click="$emit('close')"
-      >Calendar
+      >
+        Sets
       </router-link>
     </nav>
 
@@ -49,15 +46,20 @@
   </header>
 </template>
 
-<script>
-export default {
-  name: "TheNavbar",
-  props: {
-    showMobileMenu: {
-      type: Boolean
-    }
-  }
-};
+<script lang="ts">
+import { Options, Vue } from "vue-class-component";
+import { Prop } from "vue-property-decorator";
+
+@Options({
+  emits: ["open", "close"]
+})
+export default class TheNavbar extends Vue {
+  @Prop({
+    type: Boolean,
+    default: false
+  })
+  showMobileMenu!: boolean;
+}
 </script>
 
 <style lang="scss" scoped>

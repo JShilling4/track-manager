@@ -23,13 +23,24 @@
       >
         <h5>Drop your files here</h5>
       </div>
-      <input type="file" multiple @change="uploadSong($event)" />
+      <input
+        type="file"
+        multiple
+        @change="uploadSong($event)"
+      />
       <hr class="hr" />
 
       <!-- Progess Bars -->
-      <div v-for="upload in uploads" :key="upload.name" class="progressBar">
+      <div
+        v-for="upload in uploads"
+        :key="upload.name"
+        class="progressBar"
+      >
         <!-- File Name -->
-        <div class="progressBar__fileName" :class="upload.textClass">
+        <div
+          class="progressBar__fileName"
+          :class="upload.textClass"
+        >
           <i :class="upload.icon"></i> {{ upload.name }}
         </div>
 
@@ -46,29 +57,28 @@
   </div>
 </template>
 
-<script>
-import { mapActions } from "vuex";
+<script lang="ts">
 import { storage, tracksCollection } from "@/includes/firebase";
+import { ITracksRepository, ITrackUpload, TrackDto } from "@/types";
+import { inject } from "inversify-props";
+import { Options, Vue } from "vue-class-component";
 
-export default {
-  name: "Upload",
-  data() {
-    return {
-      isDragover: false,
-      uploads: [],
-    };
-  },
+@Options({})
+export default class TrackUpload extends Vue {
+  @inject() tracksRepository!: ITracksRepository;
 
-  methods: {
-    ...mapActions(["addTrack"]),
+  private isDragover = false;
+  private uploads: ITrackUpload[] = [];
 
-    uploadSong(event) {
-      this.isDragover = false;
+  uploadSong(event: Event): void {
+    const e = event as InputEvent;
+    this.isDragover = false;
 
-      const files = event.dataTransfer
-        ? [...event.dataTransfer.files]
-        : [...event.target.files];
-      files.forEach((file) => {
+    const files = e.dataTransfer
+      ? [...e.dataTransfer.files]
+      : [(e.target as HTMLInputElement).files];
+    files.forEach((file) => {
+      if (file instanceof File) {
         if (file.type !== "audio/mpeg") {
           return;
         }
@@ -84,7 +94,7 @@ export default {
             name: fileName,
             variant: "neutralColor",
             icon: "fas fa-spinner fa-spin",
-            textClass: "",
+            textClass: ""
           }) - 1;
 
         task.on(
@@ -101,7 +111,7 @@ export default {
             console.log(error);
           },
           async () => {
-            const track = {
+            const track: TrackDto = {
               artist: "",
               originalName: task.snapshot.ref.name,
               modifiedName: task.snapshot.ref.name,
@@ -111,29 +121,31 @@ export default {
               bpm: "",
               referenceLink: "",
               notes: "",
+              docID: "",
+              url: "",
             };
 
             track.url = await task.snapshot.ref.getDownloadURL();
             const trackRef = await tracksCollection.add(track);
             const trackSnapshot = await trackRef.get();
 
-            this.addTrack(trackSnapshot);
+            this.$emit("upload", trackSnapshot);
 
             this.uploads[uploadIndex].variant = "successColor";
             this.uploads[uploadIndex].icon = "fas fa-check";
             this.uploads[uploadIndex].textClass = "successColor";
           }
         );
-      });
-    },
-  },
+      }
+    });
+  }
 
-  beforeUnmount() {
+  beforeUnmount(): void {
     this.uploads.forEach((upload) => {
       upload.task.cancel();
     });
-  },
-};
+  }
+}
 </script>
 
 <style lang="scss" scoped>

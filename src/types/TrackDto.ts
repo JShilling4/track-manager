@@ -4,9 +4,9 @@ import { JsonProperty, Serializable } from "typescript-json-serializer";
 export class TrackDto {
   @JsonProperty() id?: string;
   @JsonProperty() docID!: string;
-  @JsonProperty() artist!: string;
+  @JsonProperty() artist!: string | null;
   @JsonProperty() bpm!: string | null;
-  @JsonProperty() category!: string;
+  @JsonProperty() category!: string | null;
   @JsonProperty() key!: string | null;
   @JsonProperty() lastUpdated!: string;
   @JsonProperty() modifiedName!: string;

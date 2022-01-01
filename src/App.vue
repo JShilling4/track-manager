@@ -6,46 +6,32 @@
     @close="showMobileMenu = false"
   />
   <router-view />
-  <music-player />
 </template>
 
-<script>
-import { mapActions } from "vuex";
+<script lang="ts">
 import TheNavbar from "@/components/TheNavbar.vue";
-import MusicPlayer from "@/components/MusicPlayer.vue";
+import { Options, Vue } from "vue-class-component";
 
-export default {
+@Options({
   components: {
     "the-navbar": TheNavbar,
-    "music-player": MusicPlayer
-  },
 
-  data() {
-    return {
-      showMobileMenu: false,
-      windowWidth: document.documentElement.clientWidth
-    };
-  },
+  }
+})
+export default class App extends Vue {
+  private showMobileMenu = false;
+  private windowWidth = document.documentElement.clientWidth;
 
-  methods: {
-    ...mapActions(["fetchCategories", "fetchTracks"]),
+  getWindowWidth(): void {
+    this.windowWidth = document.documentElement.clientWidth;
+  }
 
-    getWindowWidth() {
-      this.windowWidth = document.documentElement.clientWidth;
-    }
-  },
-
-  async created() {
-    this.fetchCategories();
-    this.fetchTracks();
-  },
-
-  mounted() {
+  mounted(): void {
     this.$nextTick(() => {
       window.addEventListener("resize", this.getWindowWidth);
     });
   }
-};
+}
 </script>
 
 <style src="@vueform/multiselect/themes/default.css"></style>
