@@ -40,13 +40,14 @@ export class TracksRepository implements ITracksRepository {
     return tracks;
   }
 
-  public async update(track: TrackDto): Promise<void> {
+  public async update(track: TrackDto): Promise<TrackDto | never> {
     try {
-      return await tracksCollection
+      await tracksCollection
         .doc(track.docID)
         .update(track)
+      return track;
     } catch (error) {
-      console.log(error);
+      return Promise.reject(error);
     }
   }
 

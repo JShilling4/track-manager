@@ -10,14 +10,15 @@
     <template v-slot:body>
       <!-- Edit Form -->
       <div>
+        <!-- TODO: move this to toast -->
         <!-- Alert Message -->
-        <div
+        <!-- <div
           v-if="showAlert"
           class="alertMessage"
           :class="alertVariant"
         >
           {{ alertMessage }}
-        </div>
+        </div> -->
 
         <form @submit.prevent="edit">
           <!-- Title -->
@@ -130,15 +131,20 @@
 import Multiselect from "@vueform/multiselect";
 import cloneDeep from "lodash/cloneDeep";
 import { Options, Vue } from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import { CategoryDto, TrackDto } from "@/types";
+import { Inject, Prop, Watch } from "vue-property-decorator";
+import { CategoryDto, ITracksRepository, TrackDto } from "@/types";
+import { inject } from "inversify-props";
 
 @Options({
   components: {
     "multi-select": Multiselect
-  }
+  },
+  emits: ["close"]
 })
 export default class EditTrackModal extends Vue {
+  @inject() tracksRepository!: ITracksRepository;
+
+  @Inject() private updateTrack!: (track: TrackDto) => void;
 
   @Prop({
     type: Boolean,
@@ -148,8 +154,9 @@ export default class EditTrackModal extends Vue {
 
   @Prop({
     type: Object,
+    default: new TrackDto()
   })
-  track?: TrackDto;
+  track!: TrackDto;
 
   @Prop({
     type: Array
@@ -158,9 +165,9 @@ export default class EditTrackModal extends Vue {
 
   private localTrack: TrackDto = new TrackDto();
   private inSubmission = false;
-  private showAlert = false;
-  private alertVariant = "nuetralColor";
-  private alertMessage = "Please wait while the track info is updated...";
+  // private showAlert = false;
+  // private alertVariant = "nuetralColor";
+  // private alertMessage = "Please wait while the track info is updated...";
 
   @Watch("track")
   onTrackChanged(): void {
@@ -176,29 +183,24 @@ export default class EditTrackModal extends Vue {
 
   async edit(): Promise<void> {
     this.inSubmission = true;
-    this.showAlert = true;
-    this.alertVariant = "nuetralColor";
-    this.alertMessage = "Please wait while the track info is updated...";
-    // update the lastUpdated property
+    // this.showAlert = true;
+    // this.alertVariant = "nuetralColor";
+    // this.alertMessage = "Please wait while the track info is updated...";
     this.localTrack.lastUpdated = new Date().toISOString();
 
-    // TODO: add repository code to update a track in place
-    // const success = await this.updateTrack({
-    //   id: this.track.docID,
-    //   track: this.localTrack
-    // });
+    const success = await this.tracksRepository.update({...this.localTrack, docID: this.track.docID});
 
-    // if (success) {
-    //   this.inSubmission = false;
-    //   this.alertVariant = "successColor";
-    //   this.alertMessage = "Track successfully updated!";
-    // } else {
-    //   this.inSubmission = false;
-    //   this.alertVariant = "errorColor";
-    //   this.alertMessage = "Something went wrong! Please try again later.";
-    // }
-    // TODO: emit to parent?
-    // this.editModalShowing = false;
+    if (success) {
+      this.updateTrack({...this.localTrack, docID: this.track.docID});
+      this.inSubmission = false;
+      // this.alertVariant = "successColor";
+      // this.alertMessage = "Track successfully updated!";
+    } else {
+      this.inSubmission = false;
+      // this.alertVariant = "errorColor";
+      // this.alertMessage = "Something went wrong! Please try again later.";
+    }
+    this.$emit("close");
   }
 
   mounted(): void {

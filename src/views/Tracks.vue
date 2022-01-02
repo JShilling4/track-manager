@@ -63,6 +63,7 @@ import {
 import { inject } from "inversify-props";
 import MusicPlayer from "@/components/MusicPlayer.vue";
 import firebase from "firebase/app";
+import { Provide } from "vue-property-decorator";
 
 @Options({
   name: "TracksPage",
@@ -129,6 +130,13 @@ export default class TracksPage extends Vue {
       referenceLink,
       url
     });
+  }
+
+  @Provide() private updateTrack(track: TrackDto): void {
+    const index = this.tracks.findIndex(t => t.docID === track.docID);
+    if (index !== -1) {
+      this.tracks.splice(index, 1, track);
+    }
   }
 
   // computed

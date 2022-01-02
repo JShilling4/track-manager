@@ -3,7 +3,7 @@
     <!-- Track Name -->
     <div class="trackItem">
       <h4 class="trackItem__heading">
-        <span class="artist">{{ track.artist ? `${track.artist} - ` : ''}}</span> {{ track.modifiedName }}
+        {{ track.modifiedName }} - <span class="artist">{{ track.artist }}</span>
         <p class="lastUpdated">
           Last Updated: {{ $dayjs(track.lastUpdated).format('MM-DD-YYYY h:mma') }}
         </p>
