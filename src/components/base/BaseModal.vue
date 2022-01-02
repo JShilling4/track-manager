@@ -50,61 +50,75 @@
   </transition>
 </template>
 
-<script>
-export default {
-  name: "BaseModal",
-  props: {
-    width: {
-      type: String,
-      default: "600px"
-    },
-    show: {
-      type: Boolean,
-      required: true
-    },
-    clickaway: {
-      type: Boolean,
-      default: false
-    },
-    showCloseButton: {
-      type: Boolean,
-      default: true
-    },
-    classes: {
-      type: String,
-      default: ""
-    },
-    isLoading: {
-      type: Boolean,
-      default: false
-    },
-    backgroundColor: {
-      type: String,
-      default: "#fff"
-    },
-    isPosting: {
-      type: Boolean
-    }
-  },
-  emits: ["close", "saveProperty", "saveAddress"],
-  data() {
-    return {};
-  },
-  methods: {
-    closeModal() {
-      this.$emit("close");
-      document.querySelector("body").classList.remove("overflow-hidden");
-    },
-    clickAway() {
-      if (this.clickaway) {
-        this.$emit("close");
-      }
-    }
-  },
-  mounted() {
-    document.querySelector("body").classList.add("overflow-hidden");
+<script lang="ts">
+import { Options, Vue } from "vue-class-component";
+import { Prop } from "vue-property-decorator";
+
+@Options({
+  emits: ["close", "saveProperty", "saveAddress"]
+})
+export default class BaseModal extends Vue {
+  @Prop({
+    type: String,
+    default: "600px"
+  })
+  width!: string;
+
+  @Prop({
+    type: Boolean,
+    required: true
+  })
+  show!: boolean;
+
+  @Prop({
+    type: Boolean,
+    default: false
+  })
+  clickaway!: boolean;
+
+  @Prop({
+    type: Boolean,
+    default: true
+  })
+  showCloseButton!: boolean;
+
+  @Prop({
+    type: Boolean,
+    default: false
+  })
+  isLoading!: boolean;
+
+  @Prop({
+    type: Boolean
+  })
+  isPosting?: boolean;
+
+  @Prop({
+    type: String,
+    default: ""
+  })
+  classes!: string;
+
+  @Prop({
+    type: String,
+    default: "#fff"
+  })
+  backgroundColor!: string;
+
+  private closeModal(): void {
+    this.$emit("close");
+    document.querySelector("body")?.classList.remove("overflow-hidden");
   }
-};
+  private clickAway(): void {
+    if (this.clickaway) {
+      this.$emit("close");
+    }
+  }
+
+  mounted(): void {
+    document.querySelector("body")?.classList.add("overflow-hidden");
+  }
+}
 </script>
 
 <style lang="scss" scoped>
