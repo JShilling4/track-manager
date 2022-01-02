@@ -28,7 +28,6 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
-    "src/store/modules/TracksVuexModule.js"
   ],
   "exclude": ["node_modules"]
 }

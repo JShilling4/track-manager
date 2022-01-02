@@ -1,10 +1,8 @@
 module.exports = {
   root: true,
-
   env: {
     node: true
   },
-
   extends: [
     "plugin:@typescript-eslint/recommended",
     "plugin:vue/vue3-essential",
@@ -12,18 +10,30 @@ module.exports = {
     "@vue/typescript/recommended",
     "prettier"
   ],
-
   parserOptions: {
     ecmaVersion: 2020
   },
-
   rules: {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        types: {
+          String: false,
+          Boolean: false,
+          Number: false,
+          Symbol: false,
+          "{}": false,
+          object: false,
+          Function: false
+        },
+        extendDefaults: true
+      }
+    ],
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["warn"]
   },
-
   overrides: [
     {
       files: [
