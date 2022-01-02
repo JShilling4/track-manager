@@ -1,15 +1,14 @@
 <template>
-    <label>
-        <slot></slot>
-    </label>
+  <label>
+    <slot></slot>
+  </label>
 </template>
 
 <script>
-    export default {
-        name: "FormLabel",
-    }
+import { Vue } from "vue-class-component";
+
+export default class FormLabel extends Vue {}
 </script>
 
 <style lang="scss" scoped>
-
 </style>
