@@ -1,139 +1,133 @@
 <template>
-    <div class="trackItem-wrapper">
-        <!-- Track Name -->
-        <div class="trackItem">
-            <h4 class="trackItem__heading">
-                <span class="artist">{{ track.artist ? `${track.artist} - ` : ''}}</span> {{ track.modifiedName }}
-                <p class="lastUpdated">
-                    Last Updated: {{ $dayjs(track.lastUpdated).format('MM-DD-YYYY h:mma') }}
-                </p>
-            </h4>
+  <div class="trackItem-wrapper">
+    <!-- Track Name -->
+    <div class="trackItem">
+      <h4 class="trackItem__heading">
+        {{ track.modifiedName }} - <span class="artist">{{ track.artist }}</span>
+        <p class="lastUpdated">
+          Last Updated: {{ $dayjs(track.lastUpdated).format('MM-DD-YYYY h:mma') }}
+        </p>
+      </h4>
 
-            <div class="trackItem__controls">
-                <i
-                    class="fa fa-trash-alt icon icon--delete"
-                    @click.prevent="deleteTrack"
-                ></i>
-                <i
-                    class="fa fa-pencil-alt icon icon--edit"
-                    @click.prevent="editModalShowing = !editModalShowing"
-                ></i>
-                <i
-                    class="fas fa-download icon icon--download"
-                    @click.prevent="downloadTrack"
-                ></i>
-                <i
-                    class="far fa-play-circle icon icon--play"
-                    @click.prevent="playTrack"
-                ></i>
-            </div>
-        </div>
-
-        <edit-track-modal
-            :is-showing="editModalShowing"
-            :track="track"
-            @close="editModalShowing = false"
-        />
-
+      <div class="trackItem__controls">
+        <i
+          class="fa fa-trash-alt icon icon--delete"
+          @click.prevent="deleteTrack"
+        ></i>
+        <i
+          class="fa fa-pencil-alt icon icon--edit"
+          @click.prevent="editModalShowing = !editModalShowing"
+        ></i>
+        <i
+          class="fas fa-download icon icon--download"
+          @click.prevent="downloadTrack"
+        ></i>
+        <i
+          class="far fa-play-circle icon icon--play"
+          @click.prevent="playTrack"
+        ></i>
+      </div>
     </div>
+
+    <edit-track-modal
+      :is-showing="editModalShowing"
+      :track="track"
+      @close="editModalShowing = false"
+    />
+  </div>
 </template>
 
-<script>
-import { mapActions } from "vuex";
+<script lang="ts">
 import EditTrackModal from "./EditTrackModal.vue";
 import { storage } from "../includes/firebase";
+import { Options, Vue } from "vue-class-component";
+import { Prop } from "vue-property-decorator";
+import { ITracksRepository, TrackDto } from "@/types";
+import { inject } from "inversify-props";
 
-export default {
-    name: "TrackItem",
-    components: {
-        "edit-track-modal": EditTrackModal,
-    },
+@Options({
+  name: "TrackItem",
+  components: {
+    "edit-track-modal": EditTrackModal
+  },
+  emits: ["play", "delete"]
+})
+export default class TrackItem extends Vue {
+@inject() tracksRepository!: ITracksRepository
 
-    props: {
-        track: {
-            type: Object,
-            required: true,
-        },
-    },
+  @Prop({
+    type: Object,
+  })
+  track!: TrackDto
 
-    data() {
-        return {
-            editModalShowing: false,
+  private editModalShowing = false;
+
+  closeEditModal(): void {
+    this.editModalShowing = false;
+  }
+
+  async deleteTrack(): Promise<void> {
+    await this.tracksRepository.delete(this.track);
+    this.$emit("delete");
+  }
+
+  async downloadTrack(): Promise<void> {
+    const storageRef = storage.ref();
+    storageRef
+      .child(`tracks/${this.track.modifiedName}`)
+      .getDownloadURL()
+      .then((url) => {
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = "blob";
+        xhr.onload = () => {
+          const downloadUrl = URL.createObjectURL(xhr.response);
+          const a = document.createElement("a");
+          document.body.appendChild(a);
+          a.setAttribute("style", "display: none");
+          a.href = downloadUrl;
+          a.download = "";
+          a.click();
         };
-    },
+        xhr.open("GET", url);
+        xhr.send();
+      })
+      .catch((error) => {
+        // Handle any errors
+        console.log(error);
+      });
+  }
 
-    methods: {
-        ...mapActions(["newSong"]),
-
-        closeEditModal() {
-            this.editModalShowing = false;
-        },
-
-        async deleteTrack() {
-            this.$store.dispatch("removeTrack", this.track);
-        },
-
-        async downloadTrack() {
-            const storageRef = storage.ref();
-            storageRef
-                .child(`tracks/${this.track.modifiedName}`)
-                .getDownloadURL()
-                .then((url) => {
-                    // `url` is the download URL for 'images/stars.jpg'
-
-                    // This can be downloaded directly:
-                    const xhr = new XMLHttpRequest();
-                    xhr.responseType = "blob";
-                    xhr.onload = () => {
-                        const downloadUrl = URL.createObjectURL(xhr.response);
-                        const a = document.createElement("a");
-                        document.body.appendChild(a);
-                        a.style = "display: none";
-                        a.href = downloadUrl;
-                        a.download = "";
-                        a.click();
-                    };
-                    xhr.open("GET", url);
-                    xhr.send();
-                })
-                .catch((error) => {
-                    // Handle any errors
-                    console.log(error);
-                });
-        },
-
-        playTrack() {
-            this.newSong(this.track);
-        },
-    },
+  playTrack(): void {
+    this.$emit("play");
+  }
 };
 </script>
 
 <style lang="scss" scoped>
 .trackItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 1rem;
-    @include breakpoint(tablet-port) {
-        padding: 1rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  @include breakpoint(tablet-port) {
+    padding: 1rem 0;
+  }
+  &__heading {
+    color: #333;
+    .lastUpdated {
+      font-size: 1.2rem;
+      font-weight: 400;
     }
-    &__heading {
-        color: #333;
-        .lastUpdated {
-            font-size: 1.2rem;
-            font-weight: 400;
-        }
-        .artist {
-            color: rgb(150, 150, 150);
-        }
+    .artist {
+      color: rgb(150, 150, 150);
     }
+  }
 
-    &__controls {
-        display: flex;
-        .icon {
-            margin: 0 1rem;
-        }
+  &__controls {
+    display: flex;
+    .icon {
+      margin: 0 1rem;
     }
+  }
 }
 </style>
