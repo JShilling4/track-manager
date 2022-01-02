@@ -63,14 +63,16 @@ export default class TextInput extends Vue {
   tabIndex!: string;
 
   @Prop({
-    type: String
+    type: String,
+    default: "100%"
   })
-  width?: string;
+  width!: string;
 
   @Prop({
-    type: String
+    type: String,
+    default: "left"
   })
-  textAlign?: string;
+  textAlign!: string;
 
   @Prop({
     type: String,
