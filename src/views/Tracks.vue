@@ -36,6 +36,7 @@
             >
               <TrackItem
                 :track="track"
+                :categories="categories"
                 @play="playTrack(track)"
                 @delete="removeTrack(track)"
               />

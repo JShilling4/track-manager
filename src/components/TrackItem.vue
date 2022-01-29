@@ -32,6 +32,7 @@
     <EditTrackModal
       :is-showing="editModalShowing"
       :track="track"
+      :categories="categories"
       @close="editModalShowing = false"
     />
   </div>
@@ -42,7 +43,7 @@ import EditTrackModal from "./EditTrackModal.vue";
 import { storage } from "../includes/firebase";
 import { Options, Vue } from "vue-class-component";
 import { Prop } from "vue-property-decorator";
-import { ITracksRepository, TrackDto } from "@/types";
+import { CategoryDto, ITracksRepository, TrackDto } from "@/types";
 import { inject } from "inversify-props";
 
 @Options({
@@ -59,6 +60,11 @@ export default class TrackItem extends Vue {
     type: Object,
   })
   track!: TrackDto
+
+  @Prop({
+    type: Object,
+  })
+  categories!: CategoryDto[]
 
   private editModalShowing = false;
 
