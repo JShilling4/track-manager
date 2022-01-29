@@ -1,5 +1,5 @@
 <template>
-  <base-modal
+  <BaseModal
     width="60rem"
     :show="isShowing"
     :show-close-button="false"
@@ -7,8 +7,7 @@
     background-color="#fff"
     @close="$emit('close')"
   >
-    <template v-slot:body>
-      <!-- Edit Form -->
+    <template #body>
       <div>
         <!-- TODO: move this to toast -->
         <!-- Alert Message -->
@@ -20,59 +19,54 @@
           {{ alertMessage }}
         </div> -->
 
-        <form @submit.prevent="edit">
-          <!-- Title -->
-          <input-group>
-            <form-label>Name</form-label>
-            <text-input
+        <form @submit.prevent="editTrackInfo">
+          <InputGroup>
+            <FormLabel>Name</FormLabel>
+            <TextInput
               type="text"
               name="modifiedName"
               v-model="localTrack.modifiedName"
               class=""
               placeholder="Enter Name"
             />
-          </input-group>
+          </InputGroup>
 
-          <!-- Artist -->
-          <input-group>
-            <form-label>Artist</form-label>
-            <text-input
+          <InputGroup>
+            <FormLabel>Artist</FormLabel>
+            <TextInput
               type="text"
               name="artist"
               v-model="localTrack.artist"
               class=""
               placeholder="Enter Artist"
             />
-          </input-group>
+          </InputGroup>
 
-          <!-- Key -->
-          <input-group>
-            <form-label>Key</form-label>
-            <text-input
+          <InputGroup>
+            <FormLabel>Key</FormLabel>
+            <TextInput
               type="text"
               name="key"
               v-model="localTrack.key"
               class=""
               placeholder="Enter Key"
             />
-          </input-group>
+          </InputGroup>
 
-          <!-- BPM -->
-          <input-group>
-            <form-label>BPM</form-label>
-            <text-input
+          <InputGroup>
+            <FormLabel>BPM</FormLabel>
+            <TextInput
               type="text"
               name="bpm"
               v-model="localTrack.bpm"
               class=""
               placeholder="Enter Tempo"
             />
-          </input-group>
+          </InputGroup>
 
-          <!-- Category -->
-          <input-group>
-            <form-label>Category</form-label>
-            <multi-select
+          <InputGroup>
+            <FormLabel>Category</FormLabel>
+            <Multiselect
               name="category"
               label="name"
               value-prop="name"
@@ -81,51 +75,53 @@
               placeholder="Enter Category"
               @select="setLocalCategory"
             />
-          </input-group>
+          </InputGroup>
 
-          <!-- Reference -->
-          <input-group>
-            <form-label>Reference Link</form-label>
-            <text-input
+          <InputGroup>
+            <FormLabel>Reference Link</FormLabel>
+            <TextInput
               type="text"
               name="category"
               v-model="localTrack.referenceLink"
               class=""
               placeholder="Enter Reference Link"
             />
-          </input-group>
+          </InputGroup>
 
-          <!-- Notes -->
-          <input-group>
-            <form-label>Notes</form-label>
-            <text-input
+          <InputGroup>
+            <FormLabel>Notes</FormLabel>
+            <TextInput
               type="text"
               name="category"
               v-model="localTrack.notes"
               class=""
               placeholder="Enter Notes"
             />
-          </input-group>
+          </InputGroup>
 
-          <!-- Submit Form -->
-          <base-button
+          <InputGroup>
+            <FormLabel>New Upload</FormLabel>
+            <UploadDropbox @edit="onEdit" :track="localTrack" />
+          </InputGroup>
+
+          <BaseButton
             type="submit"
-            class=""
-          > Submit </base-button>
+            class="submit-btn"
+          > Submit </BaseButton>
 
-          <!-- Go Back -->
-          <base-button
+          <BaseButton
             type="button"
             class=""
             :disabled="inSubmission"
+            bg-color="color-tertiary"
             @click.prevent="$emit('close')"
           >
-            Cancel
-          </base-button>
+            Close
+          </BaseButton>
         </form>
       </div>
     </template>
-  </base-modal>
+  </BaseModal>
 </template>
 <script lang="ts">
 import Multiselect from "@vueform/multiselect";
@@ -134,17 +130,19 @@ import { Options, Vue } from "vue-class-component";
 import { Inject, Prop, Watch } from "vue-property-decorator";
 import { CategoryDto, ITracksRepository, TrackDto } from "@/types";
 import { inject } from "inversify-props";
+import UploadDropbox from "@/components/UploadDropbox";
 
 @Options({
   components: {
-    "multi-select": Multiselect
+    Multiselect,
+    UploadDropbox
   },
   emits: ["close"]
 })
 export default class EditTrackModal extends Vue {
   @inject() tracksRepository!: ITracksRepository;
 
-  @Inject() private updateTrack!: (track: TrackDto) => void;
+  @Inject() private updateUITrackList!: (track: TrackDto) => void;
 
   @Prop({
     type: Boolean,
@@ -171,7 +169,7 @@ export default class EditTrackModal extends Vue {
 
   @Watch("track")
   onTrackChanged(): void {
-    if(this.track) {
+    if (this.track) {
       this.localTrack = cloneDeep(this.track);
       delete this.localTrack.docID;
     }
@@ -181,17 +179,20 @@ export default class EditTrackModal extends Vue {
     this.localTrack.category = value;
   }
 
-  async edit(): Promise<void> {
+  async editTrackInfo(): Promise<void> {
     this.inSubmission = true;
     // this.showAlert = true;
     // this.alertVariant = "nuetralColor";
     // this.alertMessage = "Please wait while the track info is updated...";
     this.localTrack.lastUpdated = new Date().toISOString();
 
-    const success = await this.tracksRepository.update({...this.localTrack, docID: this.track.docID});
+    const success = await this.tracksRepository.update({
+      ...this.localTrack,
+      docID: this.track.docID
+    });
 
     if (success) {
-      this.updateTrack({...this.localTrack, docID: this.track.docID});
+      this.updateUITrackList({ ...this.localTrack, docID: this.track.docID });
       this.inSubmission = false;
       // this.alertVariant = "successColor";
       // this.alertMessage = "Track successfully updated!";
@@ -201,6 +202,11 @@ export default class EditTrackModal extends Vue {
       // this.alertMessage = "Something went wrong! Please try again later.";
     }
     this.$emit("close");
+  }
+
+  onEdit(track: TrackDto): void {
+    this.localTrack = track;
+    this.editTrackInfo();
   }
 
   mounted(): void {
@@ -215,5 +221,9 @@ export default class EditTrackModal extends Vue {
 .alertMessage {
   font-size: 2rem;
   margin-bottom: 2rem;
+}
+
+.submit-btn {
+  margin-right: 1rem;
 }
 </style>

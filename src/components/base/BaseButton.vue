@@ -19,7 +19,7 @@ export default class BaseButton extends Vue {
     type: String,
     default: "button-primary-bgcolor"
   })
-  backgroundColor!: string;
+  bgColor!: string;
 
   @Prop({
     type: String,
@@ -82,7 +82,7 @@ export default class BaseButton extends Vue {
   dropShadow!: string;
 
   private styleObject = {
-    backgroundColor: `var(--${this.backgroundColor})`,
+    backgroundColor: `var(--${this.bgColor})`,
     border: this.border,
     borderRadius: this.borderRadius,
     boxShadow: this.showShadow ? `var(--${this.dropShadow})` : "",
