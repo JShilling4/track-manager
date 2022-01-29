@@ -4,13 +4,13 @@
     <div class="content">
       <!-- Upload Area -->
       <div class="upload-container">
-        <track-upload @upload="addTrack" />
+        <TrackUpload />
       </div>
 
       <!-- Uploaded List -->
       <div class="mainList-container">
         <div class="categoryFilter">
-          <multi-select
+          <Multiselect
             name="category"
             label="name"
             value-prop="name"
@@ -34,7 +34,7 @@
               :key="track.docID"
               class="track-container"
             >
-              <track-item
+              <TrackItem
                 :track="track"
                 @play="playTrack(track)"
                 @delete="removeTrack(track)"
@@ -46,7 +46,7 @@
       </div>
     </div>
   </section>
-  <music-player ref="musicPlayerRef" />
+  <MusicPlayer ref="musicPlayerRef" />
 </template>
 
 <script lang="ts">
@@ -68,10 +68,10 @@ import { Provide } from "vue-property-decorator";
 @Options({
   name: "TracksPage",
   components: {
-    "track-upload": TrackUpload,
-    "track-item": TrackItem,
-    "multi-select": Multiselect,
-    "music-player": MusicPlayer
+    TrackUpload,
+    TrackItem,
+    Multiselect,
+    MusicPlayer
   }
 })
 export default class TracksPage extends Vue {
@@ -82,13 +82,11 @@ export default class TracksPage extends Vue {
   private categories: CategoryDto[] = [];
   private tracks: TrackDto[] = [];
 
-  // lifecycle hooks
   async created(): Promise<void> {
     this.tracks = await this.tracksRepository.getAll();
     this.categories = await this.categoriesRepository.getAll();
   }
 
-  // methods
   playTrack(track: TrackDto): void {
     const musicPlayerRef = this.$refs.musicPlayerRef as InstanceType<
       typeof MusicPlayer
@@ -101,7 +99,7 @@ export default class TracksPage extends Vue {
     this.tracks.splice(trackIndex, 1);
   }
 
-  addTrack(
+  @Provide() private addToUITrackList(
     document: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>
   ): void {
     const {
@@ -132,14 +130,13 @@ export default class TracksPage extends Vue {
     });
   }
 
-  @Provide() private updateTrack(track: TrackDto): void {
+  @Provide() private updateUITrackList(track: TrackDto): void {
     const index = this.tracks.findIndex(t => t.docID === track.docID);
     if (index !== -1) {
       this.tracks.splice(index, 1, track);
     }
   }
 
-  // computed
   get categoriesFilterList(): string[] {
     let list = this.categories.map((category) => {
       return category.name;

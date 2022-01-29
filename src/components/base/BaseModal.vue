@@ -52,9 +52,10 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
+import { Prop, Watch } from "vue-property-decorator";
 
 @Options({
+  name: "BaseModal",
   emits: ["close", "saveProperty", "saveAddress"]
 })
 export default class BaseModal extends Vue {
@@ -105,6 +106,15 @@ export default class BaseModal extends Vue {
   })
   backgroundColor!: string;
 
+  @Watch("show")
+  onShowChanged(val: boolean): void {
+    if (val) {
+      document.querySelector("body")?.classList.add("overflow-hidden");
+    } else {
+      document.querySelector("body")?.classList.remove("overflow-hidden");
+    }
+  }
+
   private closeModal(): void {
     this.$emit("close");
     document.querySelector("body")?.classList.remove("overflow-hidden");
@@ -113,10 +123,6 @@ export default class BaseModal extends Vue {
     if (this.clickaway) {
       this.$emit("close");
     }
-  }
-
-  mounted(): void {
-    document.querySelector("body")?.classList.add("overflow-hidden");
   }
 }
 </script>

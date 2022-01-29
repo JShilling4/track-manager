@@ -59,10 +59,12 @@ export default class App extends Vue {
 .errorColor {
   color: rgb(255, 51, 51);
 }
+
 .successColor {
   color: rgb(14, 211, 119);
   font-weight: 600;
 }
+
 .neutralColor {
   color: rgb(65, 130, 252);
 }
@@ -89,5 +91,9 @@ export default class App extends Vue {
   &--play {
     background-color: var(--color-play);
   }
+}
+
+.overflow-hidden {
+  overflow: hidden;
 }
 </style>

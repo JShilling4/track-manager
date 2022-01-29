@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <edit-track-modal
+    <EditTrackModal
       :is-showing="editModalShowing"
       :track="track"
       @close="editModalShowing = false"
@@ -48,7 +48,7 @@ import { inject } from "inversify-props";
 @Options({
   name: "TrackItem",
   components: {
-    "edit-track-modal": EditTrackModal
+    EditTrackModal
   },
   emits: ["play", "delete"]
 })
