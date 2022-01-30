@@ -42,7 +42,12 @@
 import EditTrackModal from "./EditTrackModal.vue";
 import { Options, Vue } from "vue-class-component";
 import { Prop } from "vue-property-decorator";
-import { CategoryDto, ITracksRepository, TrackDto } from "@/types";
+import {
+  CategoryDto,
+  IStorageRepository,
+  ITracksRepository,
+  TrackDto
+} from "@/types";
 import { inject } from "inversify-props";
 
 @Options({
@@ -53,17 +58,18 @@ import { inject } from "inversify-props";
   emits: ["play", "delete"]
 })
 export default class TrackItem extends Vue {
-@inject() tracksRepository!: ITracksRepository
+  @inject() tracksRepository!: ITracksRepository;
+  @inject() storageRepository!: IStorageRepository;
 
   @Prop({
-    type: Object,
+    type: Object
   })
-  track!: TrackDto
+  track!: TrackDto;
 
   @Prop({
-    type: Object,
+    type: Object
   })
-  categories!: CategoryDto[]
+  categories!: CategoryDto[];
 
   private editModalShowing = false;
 
@@ -77,7 +83,7 @@ export default class TrackItem extends Vue {
   }
 
   async downloadTrack(): Promise<void> {
-    const url = await this.tracksRepository.download(this.track.modifiedName);
+    const url = await this.storageRepository.download(this.track.modifiedName);
     const xhr = new XMLHttpRequest();
     xhr.responseType = "blob";
     xhr.onload = () => {
@@ -96,7 +102,7 @@ export default class TrackItem extends Vue {
   playTrack(): void {
     this.$emit("play");
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

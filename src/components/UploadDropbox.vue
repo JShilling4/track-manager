@@ -52,8 +52,12 @@
 </template>
 
 <script lang="ts">
-import { storage, tracksCollection } from "@/includes/firebase";
-import { ITracksRepository, ITrackUpload, TrackDto } from "@/types";
+import {
+  IStorageRepository,
+  ITracksRepository,
+  ITrackUpload,
+  TrackDto
+} from "@/types";
 import { inject } from "inversify-props";
 import { Options, Vue } from "vue-class-component";
 import { Inject, Prop } from "vue-property-decorator";
@@ -62,6 +66,7 @@ import firebase from "firebase/app";
 @Options({})
 export default class UploadDropbox extends Vue {
   @inject() tracksRepository!: ITracksRepository;
+  @inject() storageRepository!: IStorageRepository;
 
   @Inject() private addToUITrackList!: (
     track: firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>
@@ -95,28 +100,21 @@ export default class UploadDropbox extends Vue {
   uploadSongs(files: File[]): void {
     if (files) {
       files.forEach(async (file: File) => {
+        // stop if file is not mp3
         if (file.type !== "audio/mpeg") {
           return;
         }
-        const fileName = file.name.split(".").slice(0, -1).join(".");
-        const storageRef = storage.ref(); // music-hub-d0bcb.appspot.com
-        const trackRef = storageRef.child(`tracks/${fileName}`); // music-hub-d0bcb.appspot.com/tracks/example.mp3
-
+        // Delete the file first if it exists
         if (this.track) {
-          // Delete the file first
-          try {
-            await trackRef.delete();
-          } catch (err) {
-            console.log(err);
-          }
+          await this.storageRepository.delete(this.track.originalName);
         }
-        const task = trackRef.put(file);
+        const task = this.storageRepository.put(file);
 
         const uploadIndex =
           this.uploads.push({
             task,
             currentProgress: 0,
-            name: fileName,
+            name: file.name.split(".").slice(0, -1).join("."),
             variant: "neutralColor",
             icon: "fas fa-spinner fa-spin",
             textClass: ""
@@ -154,15 +152,12 @@ export default class UploadDropbox extends Vue {
               lastUpdated: new Date().toISOString()
             };
             track.url = await task.snapshot.ref.getDownloadURL();
-            console.log("track info:" + track);
 
             if (!this.track) {
-              console.log("adding track");
-              const trackRef = await tracksCollection.add(track);
+              const trackRef = await this.tracksRepository.add(track);
               const trackSnapshot = await trackRef.get();
               this.addToUITrackList(trackSnapshot);
             } else {
-              console.log("editing track");
               this.$emit("edit", track);
             }
 

@@ -1,9 +1,12 @@
-import { storage, tracksCollection } from "@/includes/firebase";
-import { ITracksRepository, TrackDto } from "@/types";
-import { injectable } from "inversify-props";
+import { tracksCollection } from "@/includes/firebase";
+import firebase from "firebase/app";
+import { IStorageRepository, ITracksRepository, TrackDto } from "@/types";
+import { inject, injectable } from "inversify-props";
 
 @injectable()
 export class TracksRepository implements ITracksRepository {
+  @inject() storageRepository!: IStorageRepository;
+
   public async getAll(): Promise<TrackDto[]> {
     const trackSnapshots = await tracksCollection.get();
     const tracks: TrackDto[] = [];
@@ -42,9 +45,7 @@ export class TracksRepository implements ITracksRepository {
 
   public async update(track: TrackDto): Promise<TrackDto | never> {
     try {
-      await tracksCollection
-        .doc(track.docID)
-        .update(track)
+      await tracksCollection.doc(track.docID).update(track);
       return track;
     } catch (error) {
       return Promise.reject(error);
@@ -52,16 +53,14 @@ export class TracksRepository implements ITracksRepository {
   }
 
   public async delete(track: TrackDto): Promise<void> {
-    const storageRef = storage.ref();
-    const trackRef = storageRef.child(`tracks/${track.originalName}`);
-
-    await trackRef.delete();
-
-    await tracksCollection.doc(track.docID).delete();
+    await this.storageRepository.delete(track.originalName);
+    return await tracksCollection.doc(track.docID).delete();
   }
 
-  public async download(modifiedName: string): Promise<string> {
-    const storageRef = storage.ref();
-    return storageRef.child(`tracks/${modifiedName}`).getDownloadURL();
+  public async add(
+    track: TrackDto
+  ): Promise<
+    firebase.firestore.DocumentReference<firebase.firestore.DocumentData>> {
+    return await tracksCollection.add(track);
   }
 }

@@ -36,9 +36,9 @@ export default class App extends Vue {
 
 <style src="@vueform/multiselect/themes/default.css"></style>
 <style lang="scss">
-@import "~@/design/scss/variables";
-@import "~@/design/scss/base";
-@import "~@/design/scss/typography";
+@import "~@/scss/variables";
+@import "~@/scss/base";
+@import "~@/scss/typography";
 
 .container {
   max-width: 1500px;
