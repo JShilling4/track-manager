@@ -2,23 +2,27 @@
   <section class="page-wrapper container">
     <h2>Tracks</h2>
     <div class="content">
-      <!-- Upload Area -->
-      <div class="upload-container">
+      <div class="col1">
         <TrackUpload />
+
+        <div class="categories-container">
+          <h3>Categories</h3>
+          <ul>
+            <li
+              class="category-line"
+              :class="{ selected: selectedCategory === category}"
+              v-for="category in categoriesFilterList"
+              :key="category"
+              @click="selectedCategory = category"
+            >
+              <span class="count">{{ `(${categoryCount(category)})` }}</span>{{ category }}
+            </li>
+          </ul>
+        </div>
       </div>
 
       <!-- Uploaded List -->
       <div class="mainList-container">
-        <div class="categoryFilter">
-          <Multiselect
-            name="category"
-            label="name"
-            value-prop="name"
-            v-model="selectedCategory"
-            :options="categoriesFilterList"
-            placeholder="Enter Category"
-          />
-        </div>
         <div class="mainList">
           <!-- Header -->
           <div class="mainList__header">
@@ -132,7 +136,7 @@ export default class TracksPage extends Vue {
   }
 
   @Provide() private updateUITrackList(track: TrackDto): void {
-    const index = this.tracks.findIndex(t => t.docID === track.docID);
+    const index = this.tracks.findIndex((t) => t.docID === track.docID);
     if (index !== -1) {
       this.tracks.splice(index, 1, track);
     }
@@ -151,6 +155,12 @@ export default class TracksPage extends Vue {
       ? this.tracks
       : this.tracks.filter((track) => track.category === this.selectedCategory);
   }
+
+  categoryCount(categoryName: string): number {
+    return categoryName === "All"
+      ? this.tracks.length
+      : this.tracks.filter((track) => track.category === categoryName).length;
+  }
 }
 </script>
 
@@ -166,11 +176,29 @@ h2 {
   }
 }
 
-.upload-container {
+.col1 {
   width: 30%;
   @include breakpoint(tablet-land) {
     width: 100%;
     order: 2;
+  }
+
+  .categories-container {
+    margin-top: 2rem;
+    h3 {
+      margin-bottom: 1rem;
+    }
+    .category-line {
+      cursor: pointer;
+      .count {
+        display: inline-block;
+        width: 4rem;
+      }
+      &.selected {
+        color: var(--color-primary);
+        font-weight: bold;
+      }
+    }
   }
 }
 

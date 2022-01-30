@@ -1,8 +1,8 @@
 // Interfaces
-export * from "./ITrackUpload";
+export * from "./interfaces/ITrackUpload";
 // Repositories
-export * from "./ICategoriesRepository";
-export * from "./ITracksRepository";
+export * from "./interfaces/ICategoriesRepository";
+export * from "./interfaces/ITracksRepository";
 // DTO
-export * from "./CategoryDto";
-export * from "./TrackDto";
+export * from "./dto/CategoryDto";
+export * from "./dto/TrackDto";
