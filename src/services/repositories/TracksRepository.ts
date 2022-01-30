@@ -59,4 +59,9 @@ export class TracksRepository implements ITracksRepository {
 
     await tracksCollection.doc(track.docID).delete();
   }
+
+  public async download(modifiedName: string): Promise<string> {
+    const storageRef = storage.ref();
+    return storageRef.child(`tracks/${modifiedName}`).getDownloadURL();
+  }
 }

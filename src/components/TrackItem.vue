@@ -40,7 +40,6 @@
 
 <script lang="ts">
 import EditTrackModal from "./EditTrackModal.vue";
-import { storage } from "../includes/firebase";
 import { Options, Vue } from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 import { CategoryDto, ITracksRepository, TrackDto } from "@/types";
@@ -78,29 +77,20 @@ export default class TrackItem extends Vue {
   }
 
   async downloadTrack(): Promise<void> {
-    const storageRef = storage.ref();
-    storageRef
-      .child(`tracks/${this.track.modifiedName}`)
-      .getDownloadURL()
-      .then((url) => {
-        const xhr = new XMLHttpRequest();
-        xhr.responseType = "blob";
-        xhr.onload = () => {
-          const downloadUrl = URL.createObjectURL(xhr.response);
-          const a = document.createElement("a");
-          document.body.appendChild(a);
-          a.setAttribute("style", "display: none");
-          a.href = downloadUrl;
-          a.download = "";
-          a.click();
-        };
-        xhr.open("GET", url);
-        xhr.send();
-      })
-      .catch((error) => {
-        // Handle any errors
-        console.log(error);
-      });
+    const url = await this.tracksRepository.download(this.track.modifiedName);
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = "blob";
+    xhr.onload = () => {
+      const downloadUrl = URL.createObjectURL(xhr.response);
+      const a = document.createElement("a");
+      document.body.appendChild(a);
+      a.setAttribute("style", "display: none");
+      a.href = downloadUrl;
+      a.download = "";
+      a.click();
+    };
+    xhr.open("GET", url);
+    xhr.send();
   }
 
   playTrack(): void {
