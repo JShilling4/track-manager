@@ -101,7 +101,10 @@
 
           <InputGroup>
             <FormLabel>New Upload</FormLabel>
-            <UploadDropbox @edit="onEdit" :track="localTrack" />
+            <UploadDropbox
+              @edit="onEdit"
+              :track="localTrack"
+            />
           </InputGroup>
 
           <BaseButton
@@ -130,12 +133,25 @@ import { Options, Vue } from "vue-class-component";
 import { Inject, Prop, Watch } from "vue-property-decorator";
 import { CategoryDto, ITracksRepository, TrackDto } from "@/types";
 import { inject } from "inversify-props";
-import UploadDropbox from "@/components/UploadDropbox";
+import {
+  UploadDropbox,
+  BaseButton,
+  FormLabel,
+  BaseModal,
+  InputGroup,
+  TextInput
+} from "@/components";
 
 @Options({
+  name: "EditTrackModal",
   components: {
     Multiselect,
-    UploadDropbox
+    UploadDropbox,
+    BaseButton,
+    BaseModal,
+    InputGroup,
+    TextInput,
+    FormLabel
   },
   emits: ["close"]
 })

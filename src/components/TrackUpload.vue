@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import UploadDropbox from "@/components/UploadDropbox";
+import { UploadDropbox } from "@/components";
 
 @Options({
   components: {

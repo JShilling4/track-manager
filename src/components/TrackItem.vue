@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import EditTrackModal from "./EditTrackModal.vue";
+import { EditTrackModal } from "@/components";
 import { Options, Vue } from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 import {

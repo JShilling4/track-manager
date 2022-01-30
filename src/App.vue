@@ -1,5 +1,5 @@
 <template>
-  <the-navbar
+  <TheNavbar
     class="container"
     :show-mobile-menu="showMobileMenu || windowWidth > 768"
     @open="showMobileMenu = true"
@@ -9,13 +9,12 @@
 </template>
 
 <script lang="ts">
-import TheNavbar from "@/components/TheNavbar.vue";
+import { TheNavbar } from "@/components";
 import { Options, Vue } from "vue-class-component";
 
 @Options({
   components: {
-    "the-navbar": TheNavbar,
-
+    TheNavbar
   }
 })
 export default class App extends Vue {

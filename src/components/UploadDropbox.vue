@@ -73,7 +73,7 @@ export default class UploadDropbox extends Vue {
   ) => void;
 
   @Prop({
-    type: [Object, null],
+    type: Object,
     default: null
   })
   track!: TrackDto;

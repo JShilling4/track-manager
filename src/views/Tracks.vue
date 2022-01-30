@@ -13,9 +13,9 @@
               :class="{ selected: selectedCategory === category}"
               v-for="category in categoriesFilterList"
               :key="category"
-              @click="selectedCategory = category"
             >
-              <span class="count">{{ `(${categoryCount(category)})` }}</span>{{ category }}
+              <span class="count">{{ `(${categoryCount(category)})` }}</span>
+              <span @click="selectedCategory = category">{{ category }}</span>
             </li>
           </ul>
         </div>
@@ -55,8 +55,7 @@
 </template>
 
 <script lang="ts">
-import TrackItem from "@/components/TrackItem.vue";
-import TrackUpload from "@/components/TrackUpload.vue";
+import { TrackItem, TrackUpload, MusicPlayer } from "@/components";
 import Multiselect from "@vueform/multiselect";
 import { Options, Vue } from "vue-class-component";
 import {
@@ -66,7 +65,6 @@ import {
   ICategoriesRepository
 } from "@/types";
 import { inject } from "inversify-props";
-import MusicPlayer from "@/components/MusicPlayer.vue";
 import firebase from "firebase/app";
 import { Provide } from "vue-property-decorator";
 

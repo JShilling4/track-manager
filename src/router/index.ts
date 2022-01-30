@@ -1,8 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import Home from "../views/Home.vue";
-import Tracks from "../views/Tracks.vue";
-import Lists from "../views/Lists.vue";
-import Calendar from "../views/Calendar.vue";
+import { Home, Tracks, Lists, Calendar } from "../views";
 
 const routes: Array<RouteRecordRaw> = [
   {
