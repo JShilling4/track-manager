@@ -3,9 +3,12 @@
     <!-- Track Name -->
     <div class="trackItem">
       <h4 class="trackItem__heading">
-        {{ track.modifiedName }} - <span class="artist">{{ track.artist }}</span>
+        {{ track.modifiedName }} -
+        <span class="artist">{{ track.artist }}</span>
+        <span class="trackLength"> ({{ trackLengthDisplay }})</span>
         <p class="lastUpdated">
-          Last Updated: {{ $dayjs(track.lastUpdated).format('MM-DD-YYYY h:mma') }}
+          Last Updated:
+          {{ $dayjs(track.lastUpdated).format("MM-DD-YYYY h:mma") }}
         </p>
       </h4>
 
@@ -42,12 +45,8 @@
 import { EditTrackModal } from "@/components";
 import { Options, Vue } from "vue-class-component";
 import { Prop } from "vue-property-decorator";
-import {
-  CategoryDto,
-  IStorageRepository,
-  ITracksRepository,
-  TrackDto
-} from "@/types";
+import type { IStorageRepository, ITracksRepository } from "@/types";
+import type { CategoryDto, TrackDto } from "@/types";
 import { inject } from "inversify-props";
 
 @Options({
@@ -72,6 +71,13 @@ export default class TrackItem extends Vue {
   categories!: CategoryDto[];
 
   private editModalShowing = false;
+
+  get trackLengthDisplay(): string {
+    const minutes = Math.floor(this.track.length / 60);
+    let seconds = String(this.track.length % 60);
+    seconds = seconds.charAt(0) == seconds ? `0${seconds}` : seconds;
+    return `${minutes}:${seconds}`;
+  }
 
   closeEditModal(): void {
     this.editModalShowing = false;
@@ -122,6 +128,10 @@ export default class TrackItem extends Vue {
     }
     .artist {
       color: rgb(150, 150, 150);
+    }
+    .trackLength {
+      font-size: 1.2rem;
+      font-weight: 300;
     }
   }
 

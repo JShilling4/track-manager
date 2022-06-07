@@ -54,6 +54,17 @@
           </InputGroup>
 
           <InputGroup>
+            <FormLabel>Length (seconds)</FormLabel>
+            <TextInput
+              type="text"
+              name="length"
+              v-model="localTrack.length"
+              class=""
+              placeholder="Enter Length"
+            />
+          </InputGroup>
+
+          <InputGroup>
             <FormLabel>BPM</FormLabel>
             <TextInput
               type="text"
@@ -101,16 +112,10 @@
 
           <InputGroup>
             <FormLabel>New Upload</FormLabel>
-            <UploadDropbox
-              @edit="onEdit"
-              :track="localTrack"
-            />
+            <UploadDropbox @edit="onEdit" :track="localTrack" />
           </InputGroup>
 
-          <BaseButton
-            type="submit"
-            class="submit-btn"
-          > Submit </BaseButton>
+          <BaseButton type="submit" class="submit-btn"> Submit </BaseButton>
 
           <BaseButton
             type="button"
@@ -131,7 +136,8 @@ import Multiselect from "@vueform/multiselect";
 import cloneDeep from "lodash/cloneDeep";
 import { Options, Vue } from "vue-class-component";
 import { Inject, Prop, Watch } from "vue-property-decorator";
-import { CategoryDto, ITracksRepository, TrackDto } from "@/types";
+import type { ITracksRepository } from "@/types";
+import { CategoryDto, TrackDto } from "@/types";
 import { inject } from "inversify-props";
 import {
   UploadDropbox,

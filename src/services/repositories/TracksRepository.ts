@@ -1,6 +1,7 @@
 import { tracksCollection } from "@/includes/firebase";
 import firebase from "firebase/app";
-import { IStorageRepository, ITracksRepository, TrackDto } from "@/types";
+import type { IStorageRepository, ITracksRepository } from "@/types";
+import { TrackDto } from "@/types";
 import { inject, injectable } from "inversify-props";
 
 @injectable()
@@ -17,6 +18,7 @@ export class TracksRepository implements ITracksRepository {
         bpm,
         category,
         key,
+        length,
         lastUpdated,
         modifiedName,
         notes,
@@ -31,6 +33,7 @@ export class TracksRepository implements ITracksRepository {
         bpm,
         category,
         key,
+        length,
         lastUpdated,
         modifiedName,
         notes,
@@ -60,7 +63,8 @@ export class TracksRepository implements ITracksRepository {
   public async add(
     track: TrackDto
   ): Promise<
-    firebase.firestore.DocumentReference<firebase.firestore.DocumentData>> {
+    firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
+  > {
     return await tracksCollection.add(track);
   }
 }

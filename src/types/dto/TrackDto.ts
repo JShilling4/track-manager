@@ -8,6 +8,7 @@ export class TrackDto {
   @JsonProperty() bpm!: string | null;
   @JsonProperty() category!: string | null;
   @JsonProperty() key!: string | null;
+  @JsonProperty() length!: number;
   @JsonProperty() lastUpdated!: string;
   @JsonProperty() modifiedName!: string;
   @JsonProperty() notes!: string | null;

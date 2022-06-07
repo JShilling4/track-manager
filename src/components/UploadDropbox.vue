@@ -3,11 +3,11 @@
     <!-- Upload Dropbox -->
     <div
       :class="[
-          'container',
-          {
-            hovering: isDragover,
-          },
-        ]"
+        'container',
+        {
+          hovering: isDragover
+        }
+      ]"
       @drag.prevent.stop=""
       @dragstart.prevent.stop=""
       @dragend.prevent.stop="isDragover = false"
@@ -18,24 +18,13 @@
     >
       <h5>Drop your files here</h5>
     </div>
-    <input
-      type="file"
-      multiple
-      @change="onFileChange($event)"
-    />
+    <input type="file" multiple @change="onFileChange($event)" />
     <hr class="hr" />
 
     <!-- Progess Bars -->
-    <div
-      v-for="upload in uploads"
-      :key="upload.name"
-      class="progressBar"
-    >
+    <div v-for="upload in uploads" :key="upload.name" class="progressBar">
       <!-- File Name -->
-      <div
-        class="progressBar__fileName"
-        :class="upload.textClass"
-      >
+      <div class="progressBar__fileName" :class="upload.textClass">
         <i :class="upload.icon"></i> {{ upload.name }}
       </div>
 
@@ -52,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import {
+import type {
   IStorageRepository,
   ITracksRepository,
   ITrackUpload,
@@ -143,6 +132,7 @@ export default class UploadDropbox extends Vue {
                     modifiedName: task.snapshot.ref.name,
                     category: "",
                     key: "",
+                    length: -1,
                     bpm: "",
                     referenceLink: "",
                     notes: "",

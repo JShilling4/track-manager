@@ -10,7 +10,7 @@
           <ul>
             <li
               class="category-line"
-              :class="{ selected: selectedCategory === category}"
+              :class="{ selected: selectedCategory === category }"
               v-for="category in categoriesFilterList"
               :key="category"
             >
@@ -58,7 +58,7 @@
 import { TrackItem, TrackUpload, MusicPlayer } from "@/components";
 import Multiselect from "@vueform/multiselect";
 import { Options, Vue } from "vue-class-component";
-import {
+import type {
   TrackDto,
   ITracksRepository,
   CategoryDto,
@@ -110,6 +110,7 @@ export default class TracksPage extends Vue {
       bpm,
       category,
       key,
+      length,
       lastUpdated,
       modifiedName,
       notes,
@@ -124,6 +125,7 @@ export default class TracksPage extends Vue {
       bpm,
       category,
       key,
+      length,
       lastUpdated,
       modifiedName,
       notes,
