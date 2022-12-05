@@ -1,3 +1,98 @@
+<script setup lang="ts">
+import Multiselect from "@vueform/multiselect";
+import tracksRepository from "../repositories/tracksRepository";
+import cloneDeep from "lodash/cloneDeep";
+import FormLabel from "./FormLabel.vue";
+import TextInput from "./TextInput.vue";
+import InputGroup from "./InputGroup.vue";
+import UploadDropbox from "./UploadDropbox.vue";
+import BaseButton from "./BaseButton.vue";
+import BaseModal from "./BaseModal.vue";
+import { ICategory, ITrack } from "../types";
+import { inject, onMounted, ref, watch } from "vue";
+import { updateUITrackListKey } from "../symbols";
+
+export type PropTypes = {
+  isShowing?: boolean;
+  track?: ITrack | null;
+  categories: ICategory[];
+};
+
+const props = withDefaults(defineProps<PropTypes>(), {
+  isShowing: false,
+  track: null,
+});
+
+const emit = defineEmits<{
+  (e: "close"): void;
+}>();
+
+const updateUITrackList = inject(updateUITrackListKey);
+
+const localTrack = ref<ITrack>({
+  id: "",
+  artist: "",
+  bpm: "",
+  category: "",
+  key: "",
+  length: "0",
+  lastUpdated: "",
+  modifiedName: "",
+  notes: "",
+  originalName: "",
+  referenceLink: "",
+  url: "",
+});
+const inSubmission = ref<boolean>(false);
+
+watch(
+  () => props.track,
+  (newVal: ITrack | null) => {
+    if (props.track) {
+      localTrack.value = cloneDeep(props.track);
+      delete localTrack?.value?.docID;
+    }
+  }
+);
+
+function setLocalCategory(value: string): void {
+  if (!localTrack.value) return;
+  localTrack.value.category = value;
+}
+
+async function editTrackInfo(): Promise<void> {
+  if (!localTrack.value) return;
+
+  inSubmission.value = true;
+  localTrack.value.lastUpdated = new Date().toISOString();
+
+  const success = await tracksRepository.update({
+    ...localTrack.value,
+    docID: props?.track?.docID,
+  });
+
+  if (success) {
+    updateUITrackList &&
+      updateUITrackList({ ...localTrack.value, docID: props?.track?.docID });
+    inSubmission.value = false;
+  } else {
+    inSubmission.value = false;
+  }
+  emit("close");
+}
+
+function onEdit(track: ITrack): void {
+  localTrack.value = track;
+  editTrackInfo();
+}
+
+onMounted(() => {
+  if (props.track) {
+    localTrack.value = cloneDeep(props.track);
+  }
+});
+</script>
+
 <template>
   <BaseModal
     width="60rem"
@@ -9,17 +104,7 @@
   >
     <template #body>
       <div>
-        <!-- TODO: move this to toast -->
-        <!-- Alert Message -->
-        <!-- <div
-          v-if="showAlert"
-          class="alertMessage"
-          :class="alertVariant"
-        >
-          {{ alertMessage }}
-        </div> -->
-
-        <form @submit.prevent="editTrackInfo">
+        <form v-if="localTrack" @submit.prevent="editTrackInfo">
           <InputGroup>
             <FormLabel>Name</FormLabel>
             <TextInput
@@ -131,113 +216,6 @@
     </template>
   </BaseModal>
 </template>
-<script lang="ts">
-import Multiselect from "@vueform/multiselect";
-import cloneDeep from "lodash/cloneDeep";
-import { Options, Vue } from "vue-class-component";
-import { Inject, Prop, Watch } from "vue-property-decorator";
-import type { ITracksRepository } from "@/types";
-import { CategoryDto, TrackDto } from "@/types";
-import { inject } from "inversify-props";
-import {
-  UploadDropbox,
-  BaseButton,
-  FormLabel,
-  BaseModal,
-  InputGroup,
-  TextInput
-} from "@/components";
-
-@Options({
-  name: "EditTrackModal",
-  components: {
-    Multiselect,
-    UploadDropbox,
-    BaseButton,
-    BaseModal,
-    InputGroup,
-    TextInput,
-    FormLabel
-  },
-  emits: ["close"]
-})
-export default class EditTrackModal extends Vue {
-  @inject() tracksRepository!: ITracksRepository;
-
-  @Inject() private updateUITrackList!: (track: TrackDto) => void;
-
-  @Prop({
-    type: Boolean,
-    default: false
-  })
-  isShowing!: boolean;
-
-  @Prop({
-    type: Object,
-    default: new TrackDto()
-  })
-  track!: TrackDto;
-
-  @Prop({
-    type: Array
-  })
-  categories?: CategoryDto[];
-
-  private localTrack: TrackDto = new TrackDto();
-  private inSubmission = false;
-  // private showAlert = false;
-  // private alertVariant = "nuetralColor";
-  // private alertMessage = "Please wait while the track info is updated...";
-
-  @Watch("track")
-  onTrackChanged(): void {
-    if (this.track) {
-      this.localTrack = cloneDeep(this.track);
-      delete this.localTrack.docID;
-    }
-  }
-
-  setLocalCategory(value: string): void {
-    this.localTrack.category = value;
-  }
-
-  async editTrackInfo(): Promise<void> {
-    this.inSubmission = true;
-    // this.showAlert = true;
-    // this.alertVariant = "nuetralColor";
-    // this.alertMessage = "Please wait while the track info is updated...";
-    this.localTrack.lastUpdated = new Date().toISOString();
-
-    const success = await this.tracksRepository.update({
-      ...this.localTrack,
-      docID: this.track.docID
-    });
-
-    if (success) {
-      this.updateUITrackList({ ...this.localTrack, docID: this.track.docID });
-      this.inSubmission = false;
-      // this.alertVariant = "successColor";
-      // this.alertMessage = "Track successfully updated!";
-    } else {
-      this.inSubmission = false;
-      // this.alertVariant = "errorColor";
-      // this.alertMessage = "Something went wrong! Please try again later.";
-    }
-    this.$emit("close");
-  }
-
-  onEdit(track: TrackDto): void {
-    this.localTrack = track;
-    this.editTrackInfo();
-  }
-
-  mounted(): void {
-    if (this.track) {
-      this.localTrack = cloneDeep(this.track);
-    }
-  }
-}
-</script>
 
 <style lang="scss">
 .alertMessage {

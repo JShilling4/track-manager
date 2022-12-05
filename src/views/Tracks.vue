@@ -1,10 +1,102 @@
+<script setup lang="ts">
+import TrackItem from "../components/TrackItem.vue";
+import TrackUpload from "../components/TrackUpload.vue";
+import MusicPlayer from "../components/MusicPlayer.vue";
+import tracksRepository from "../repositories/tracksRepository";
+import categoriesRepository from "../repositories/categoriesRepository";
+import { ICategory, ITrack } from "../types";
+import { addToUITrackListKey, updateUITrackListKey } from "../symbols";
+import { firebase } from "../repositories/clients/firebaseClient";
+import { computed, onBeforeMount, provide, ref } from "vue";
+
+const selectedCategory = ref<string>("All");
+const categories = ref<ICategory[]>([]);
+const tracks = ref<ITrack[]>([]);
+const musicPlayerRef = ref<InstanceType<typeof MusicPlayer> | null>(null);
+
+const categoriesFilterList = computed<string[]>(() => {
+  let list = categories.value.map((category) => {
+    return category.name;
+  });
+  list.push("All");
+  return list;
+});
+
+const selectedTracks = computed<ITrack[]>(() => {
+  return selectedCategory.value === "All"
+    ? tracks.value
+    : tracks.value.filter((track) => track.category === selectedCategory.value);
+});
+
+onBeforeMount(async () => {
+  tracks.value = await tracksRepository.getAll();
+  categories.value = await categoriesRepository.getAll();
+});
+
+function playTrack(track: ITrack): void {
+  musicPlayerRef?.value?.newSong(track);
+}
+
+function removeTrack(track: ITrack): void {
+  const trackIndex = tracks.value.findIndex((t) => t.docID === track.docID);
+  tracks.value.splice(trackIndex, 1);
+}
+
+function addToUITrackList(
+  document: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>
+): void {
+  const {
+    artist,
+    bpm,
+    category,
+    key,
+    length,
+    lastUpdated,
+    modifiedName,
+    notes,
+    originalName,
+    referenceLink,
+    url,
+  } = document.data();
+
+  tracks.value.push({
+    docID: document.id,
+    artist,
+    bpm,
+    category,
+    key,
+    length,
+    lastUpdated,
+    modifiedName,
+    notes,
+    originalName,
+    referenceLink,
+    url,
+  });
+}
+provide(addToUITrackListKey, addToUITrackList);
+
+function updateUITrackList(track: ITrack): void {
+  const index = tracks.value.findIndex((t) => t.docID === track.docID);
+  if (index !== -1) {
+    tracks.value.splice(index, 1, track);
+  }
+}
+provide(updateUITrackListKey, updateUITrackList);
+
+function categoryCount(categoryName: string): number {
+  return categoryName === "All"
+    ? tracks.value.length
+    : tracks.value.filter((track) => track.category === categoryName).length;
+}
+</script>
+
 <template>
   <section class="page-wrapper container">
     <h2>Tracks</h2>
     <div class="content">
       <div class="col1">
         <TrackUpload />
-
         <div class="categories-container">
           <h3>Categories</h3>
           <ul>
@@ -20,7 +112,6 @@
           </ul>
         </div>
       </div>
-
       <!-- Uploaded List -->
       <div class="mainList-container">
         <div class="mainList">
@@ -30,7 +121,6 @@
               {{ selectedCategory }} ({{ selectedTracks.length }})
             </h2>
           </div>
-
           <!-- List Items -->
           <div class="mainList__item-container">
             <div
@@ -54,116 +144,6 @@
   <MusicPlayer ref="musicPlayerRef" />
 </template>
 
-<script lang="ts">
-import { TrackItem, TrackUpload, MusicPlayer } from "@/components";
-import Multiselect from "@vueform/multiselect";
-import { Options, Vue } from "vue-class-component";
-import type {
-  TrackDto,
-  ITracksRepository,
-  CategoryDto,
-  ICategoriesRepository
-} from "@/types";
-import { inject } from "inversify-props";
-import firebase from "firebase/app";
-import { Provide } from "vue-property-decorator";
-
-@Options({
-  name: "TracksPage",
-  components: {
-    TrackUpload,
-    TrackItem,
-    Multiselect,
-    MusicPlayer
-  }
-})
-export default class TracksPage extends Vue {
-  @inject() private tracksRepository!: ITracksRepository;
-  @inject() private categoriesRepository!: ICategoriesRepository;
-
-  private selectedCategory = "All";
-  private categories: CategoryDto[] = [];
-  private tracks: TrackDto[] = [];
-
-  async created(): Promise<void> {
-    this.tracks = await this.tracksRepository.getAll();
-    this.categories = await this.categoriesRepository.getAll();
-  }
-
-  playTrack(track: TrackDto): void {
-    const musicPlayerRef = this.$refs.musicPlayerRef as InstanceType<
-      typeof MusicPlayer
-    >;
-    musicPlayerRef.newSong(track);
-  }
-
-  removeTrack(track: TrackDto): void {
-    const trackIndex = this.tracks.findIndex((t) => t.docID === track.docID);
-    this.tracks.splice(trackIndex, 1);
-  }
-
-  @Provide() private addToUITrackList(
-    document: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>
-  ): void {
-    const {
-      artist,
-      bpm,
-      category,
-      key,
-      length,
-      lastUpdated,
-      modifiedName,
-      notes,
-      originalName,
-      referenceLink,
-      url
-    } = document.data();
-
-    this.tracks.push({
-      docID: document.id,
-      artist,
-      bpm,
-      category,
-      key,
-      length,
-      lastUpdated,
-      modifiedName,
-      notes,
-      originalName,
-      referenceLink,
-      url
-    });
-  }
-
-  @Provide() private updateUITrackList(track: TrackDto): void {
-    const index = this.tracks.findIndex((t) => t.docID === track.docID);
-    if (index !== -1) {
-      this.tracks.splice(index, 1, track);
-    }
-  }
-
-  get categoriesFilterList(): string[] {
-    let list = this.categories.map((category) => {
-      return category.name;
-    });
-    list.push("All");
-    return list;
-  }
-
-  get selectedTracks(): TrackDto[] {
-    return this.selectedCategory === "All"
-      ? this.tracks
-      : this.tracks.filter((track) => track.category === this.selectedCategory);
-  }
-
-  categoryCount(categoryName: string): number {
-    return categoryName === "All"
-      ? this.tracks.length
-      : this.tracks.filter((track) => track.category === categoryName).length;
-  }
-}
-</script>
-
 <style lang="scss" scoped>
 h2 {
   margin-bottom: 2rem;
@@ -182,7 +162,6 @@ h2 {
     width: 100%;
     order: 2;
   }
-
   .categories-container {
     margin-top: 2rem;
     h3 {
@@ -221,7 +200,6 @@ h2 {
       font-weight: bold;
       border: 2px solid gray;
     }
-
     &__item-container {
       padding: 1rem;
       @include breakpoint(tablet-port) {

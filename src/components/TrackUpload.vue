@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import UploadDropbox from "./UploadDropbox.vue";
+</script>
+
 <template>
   <div class="track-upload">
     <div class="track-upload__header">
@@ -7,18 +11,6 @@
     <UploadDropbox />
   </div>
 </template>
-
-<script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { UploadDropbox } from "@/components";
-
-@Options({
-  components: {
-    UploadDropbox
-  }
-})
-export default class TrackUpload extends Vue {}
-</script>
 
 <style lang="scss" scoped>
 .track-upload {

@@ -1,3 +1,61 @@
+<script setup lang="ts">
+import EditTrackModal from "./EditTrackModal.vue";
+import tracksRepository from "../repositories/tracksRepository";
+import storageRepository from "../repositories/storageRepository";
+import { ICategory, ITrack } from "../types";
+import { computed, inject, ref } from "vue";
+
+const props = defineProps<{
+  track: ITrack;
+  categories: ICategory[];
+}>();
+
+const emit = defineEmits<{
+  (e: "play"): void;
+  (e: "delete"): void;
+}>();
+
+const editModalShowing = ref<boolean>(false);
+const dayjs = inject("dayJS") as any;
+
+const trackLengthDisplay = computed<string>(() => {
+  const minutes = Math.floor(Number(props.track.length) / 60);
+  let seconds = String(Number(props.track.length) % 60);
+  seconds = seconds.charAt(0) == seconds ? `0${seconds}` : seconds;
+  return `${minutes}:${seconds}`;
+});
+
+function closeEditModal(): void {
+  editModalShowing.value = false;
+}
+
+async function deleteTrack(): Promise<void> {
+  await tracksRepository.delete(props.track);
+  emit("delete");
+}
+
+async function downloadTrack(): Promise<void> {
+  const url = await storageRepository.download(props.track.modifiedName);
+  const xhr = new XMLHttpRequest();
+  xhr.responseType = "blob";
+  xhr.onload = () => {
+    const downloadUrl = URL.createObjectURL(xhr.response);
+    const a = document.createElement("a");
+    document.body.appendChild(a);
+    a.setAttribute("style", "display: none");
+    a.href = downloadUrl;
+    a.download = "";
+    a.click();
+  };
+  xhr.open("GET", url);
+  xhr.send();
+}
+
+function playTrack(): void {
+  emit("play");
+}
+</script>
+
 <template>
   <div class="trackItem-wrapper">
     <!-- Track Name -->
@@ -8,30 +66,32 @@
         <span class="trackLength"> ({{ trackLengthDisplay }})</span>
         <p class="lastUpdated">
           Last Updated:
-          {{ $dayjs(track.lastUpdated).format("MM-DD-YYYY h:mma") }}
+          {{ dayjs(track.lastUpdated).format("MM-DD-YYYY h:mma") }}
         </p>
       </h4>
-
       <div class="trackItem__controls">
-        <i
-          class="fa fa-trash-alt icon icon--delete"
+        <font-awesome-icon
+          class="icon icon--delete"
+          icon="fa-solid fa-trash"
           @click.prevent="deleteTrack"
-        ></i>
-        <i
-          class="fa fa-pencil-alt icon icon--edit"
+        ></font-awesome-icon>
+        <font-awesome-icon
+          class="icon icon--edit"
+          icon="fa-solid fa-pencil"
           @click.prevent="editModalShowing = !editModalShowing"
-        ></i>
-        <i
-          class="fas fa-download icon icon--download"
+        ></font-awesome-icon>
+        <font-awesome-icon
+          class="icon icon--download"
+          icon="fa-solid fa-download"
           @click.prevent="downloadTrack"
-        ></i>
-        <i
+        ></font-awesome-icon>
+        <font-awesome-icon
           class="far fa-play-circle icon icon--play"
+          icon="fa-solid fa-play"
           @click.prevent="playTrack"
-        ></i>
+        ></font-awesome-icon>
       </div>
     </div>
-
     <EditTrackModal
       :is-showing="editModalShowing"
       :track="track"
@@ -40,76 +100,6 @@
     />
   </div>
 </template>
-
-<script lang="ts">
-import { EditTrackModal } from "@/components";
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
-import type { IStorageRepository, ITracksRepository } from "@/types";
-import type { CategoryDto, TrackDto } from "@/types";
-import { inject } from "inversify-props";
-
-@Options({
-  name: "TrackItem",
-  components: {
-    EditTrackModal
-  },
-  emits: ["play", "delete"]
-})
-export default class TrackItem extends Vue {
-  @inject() tracksRepository!: ITracksRepository;
-  @inject() storageRepository!: IStorageRepository;
-
-  @Prop({
-    type: Object
-  })
-  track!: TrackDto;
-
-  @Prop({
-    type: Object
-  })
-  categories!: CategoryDto[];
-
-  private editModalShowing = false;
-
-  get trackLengthDisplay(): string {
-    const minutes = Math.floor(this.track.length / 60);
-    let seconds = String(this.track.length % 60);
-    seconds = seconds.charAt(0) == seconds ? `0${seconds}` : seconds;
-    return `${minutes}:${seconds}`;
-  }
-
-  closeEditModal(): void {
-    this.editModalShowing = false;
-  }
-
-  async deleteTrack(): Promise<void> {
-    await this.tracksRepository.delete(this.track);
-    this.$emit("delete");
-  }
-
-  async downloadTrack(): Promise<void> {
-    const url = await this.storageRepository.download(this.track.modifiedName);
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = "blob";
-    xhr.onload = () => {
-      const downloadUrl = URL.createObjectURL(xhr.response);
-      const a = document.createElement("a");
-      document.body.appendChild(a);
-      a.setAttribute("style", "display: none");
-      a.href = downloadUrl;
-      a.download = "";
-      a.click();
-    };
-    xhr.open("GET", url);
-    xhr.send();
-  }
-
-  playTrack(): void {
-    this.$emit("play");
-  }
-}
-</script>
 
 <style lang="scss" scoped>
 .trackItem {

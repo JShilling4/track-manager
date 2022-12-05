@@ -1,31 +1,7 @@
-# set-list-manager
+# Vue 3 + Vite
 
-## Project setup
+This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-```bash
-yarn install
-```
+## Recommended IDE Setup
 
-### Compiles and hot-reloads for development
-
-```bash
-yarn run serve-dev
-```
-
-### Compiles and minifies for production
-
-```bash
-yarn run build-prod
-```
-
-### Run your unit tests
-
-```bash
-yarn run test-unit
-```
-
-### Lints and fixes files
-
-```bash
-yarn run lint
-```
+- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)

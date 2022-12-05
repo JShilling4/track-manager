@@ -1,3 +1,124 @@
+<script setup lang="ts">
+import tracksRepository from "../repositories/tracksRepository";
+import storageRepository from "../repositories/storageRepository";
+import { ITrackUpload, ITrack } from "../types";
+import { addToUITrackListKey } from "../symbols";
+import { inject, onBeforeUnmount, ref } from "vue";
+
+const props = defineProps<{
+  track?: ITrack;
+}>();
+
+const emit = defineEmits<{
+  (e: "edit", track: ITrack): void;
+}>();
+
+const isDragover = ref<boolean>(false);
+const uploads = ref<ITrackUpload[]>([]);
+
+const addToUITrackList = inject(addToUITrackListKey);
+if (addToUITrackList === undefined) {
+  throw new Error("Failed to inject 'addToUITrackList'");
+}
+
+function onFileChange(e: Event): void {
+  const target = e.target as HTMLInputElement;
+  if (target.files && target.files.length) {
+    let files = [...target.files];
+    uploadSongs(files);
+  }
+}
+
+function onFileDrop(e: DragEvent): void {
+  isDragover.value = false;
+  if (e.dataTransfer) {
+    const files = [...e.dataTransfer.files];
+    uploadSongs(files);
+  }
+}
+
+function uploadSongs(files: File[]): void {
+  if (files) {
+    files.forEach(async (file: File) => {
+      // stop if file is not mp3
+      if (file.type !== "audio/mpeg") {
+        return;
+      }
+      // Delete the file first if it exists
+      if (props.track) {
+        await storageRepository.delete(props.track.originalName);
+      }
+      const task = storageRepository.put(file);
+
+      const uploadIndex =
+        uploads.value.push({
+          task,
+          currentProgress: 0,
+          name: file.name.split(".").slice(0, -1).join("."),
+          variant: "neutralColor",
+          icon: "fas fa-spinner fa-spin",
+          textClass: "",
+        }) - 1;
+
+      task.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          uploads.value[uploadIndex].currentProgress = progress;
+        },
+        (error) => {
+          uploads.value[uploadIndex].variant = "errorColor";
+          uploads.value[uploadIndex].icon = "fas fa-times";
+          uploads.value[uploadIndex].textClass = "errorColor";
+          console.log(error);
+        },
+        async () => {
+          const track: ITrack = {
+            ...(props.track
+              ? props.track
+              : {
+                  artist: "",
+                  originalName: task.snapshot.ref.name,
+                  modifiedName: task.snapshot.ref.name,
+                  category: "",
+                  key: "",
+                  length: "-1",
+                  bpm: "",
+                  referenceLink: "",
+                  lastUpdated: "",
+                  notes: "",
+                  docID: "",
+                  url: "",
+                }),
+            lastUpdated: new Date().toISOString(),
+          };
+          track.url = await task.snapshot.ref.getDownloadURL();
+
+          if (!track) {
+            const trackRef = await tracksRepository.add(track);
+            const trackSnapshot = await trackRef.get();
+            addToUITrackList && addToUITrackList(trackSnapshot);
+          } else {
+            emit("edit", track);
+          }
+
+          uploads.value[uploadIndex].variant = "successColor";
+          uploads.value[uploadIndex].icon = "fas fa-check";
+          uploads.value[uploadIndex].textClass = "successColor";
+        }
+      );
+    });
+  }
+}
+
+onBeforeUnmount(() => {
+  uploads.value.forEach((upload) => {
+    upload.task.cancel();
+  });
+});
+</script>
+
 <template>
   <div class="dropbox">
     <!-- Upload Dropbox -->
@@ -5,8 +126,8 @@
       :class="[
         'container',
         {
-          hovering: isDragover
-        }
+          hovering: isDragover,
+        },
       ]"
       @drag.prevent.stop=""
       @dragstart.prevent.stop=""
@@ -39,134 +160,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import type {
-  IStorageRepository,
-  ITracksRepository,
-  ITrackUpload,
-  TrackDto
-} from "@/types";
-import { inject } from "inversify-props";
-import { Options, Vue } from "vue-class-component";
-import { Inject, Prop } from "vue-property-decorator";
-import firebase from "firebase/app";
-
-@Options({})
-export default class UploadDropbox extends Vue {
-  @inject() tracksRepository!: ITracksRepository;
-  @inject() storageRepository!: IStorageRepository;
-
-  @Inject() private addToUITrackList!: (
-    track: firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>
-  ) => void;
-
-  @Prop({
-    type: Object,
-    default: null
-  })
-  track!: TrackDto;
-
-  private isDragover = false;
-  private uploads: ITrackUpload[] = [];
-
-  onFileChange(e: Event): void {
-    const target = e.target as HTMLInputElement;
-    if (target.files && target.files.length) {
-      let files = [...target.files];
-      this.uploadSongs(files);
-    }
-  }
-
-  onFileDrop(e: DragEvent): void {
-    this.isDragover = false;
-    if (e.dataTransfer) {
-      const files = [...e.dataTransfer.files];
-      this.uploadSongs(files);
-    }
-  }
-
-  uploadSongs(files: File[]): void {
-    if (files) {
-      files.forEach(async (file: File) => {
-        // stop if file is not mp3
-        if (file.type !== "audio/mpeg") {
-          return;
-        }
-        // Delete the file first if it exists
-        if (this.track) {
-          await this.storageRepository.delete(this.track.originalName);
-        }
-        const task = this.storageRepository.put(file);
-
-        const uploadIndex =
-          this.uploads.push({
-            task,
-            currentProgress: 0,
-            name: file.name.split(".").slice(0, -1).join("."),
-            variant: "neutralColor",
-            icon: "fas fa-spinner fa-spin",
-            textClass: ""
-          }) - 1;
-
-        task.on(
-          "state_changed",
-          (snapshot) => {
-            const progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            this.uploads[uploadIndex].currentProgress = progress;
-          },
-          (error) => {
-            this.uploads[uploadIndex].variant = "errorColor";
-            this.uploads[uploadIndex].icon = "fas fa-times";
-            this.uploads[uploadIndex].textClass = "errorColor";
-            console.log(error);
-          },
-          async () => {
-            const track: TrackDto = {
-              ...(this.track
-                ? this.track
-                : {
-                    artist: "",
-                    originalName: task.snapshot.ref.name,
-                    modifiedName: task.snapshot.ref.name,
-                    category: "",
-                    key: "",
-                    length: -1,
-                    bpm: "",
-                    referenceLink: "",
-                    notes: "",
-                    docID: "",
-                    url: ""
-                  }),
-              lastUpdated: new Date().toISOString()
-            };
-            track.url = await task.snapshot.ref.getDownloadURL();
-
-            if (!this.track) {
-              const trackRef = await this.tracksRepository.add(track);
-              const trackSnapshot = await trackRef.get();
-              this.addToUITrackList(trackSnapshot);
-            } else {
-              this.$emit("edit", track);
-            }
-
-            this.uploads[uploadIndex].variant = "successColor";
-            this.uploads[uploadIndex].icon = "fas fa-check";
-            this.uploads[uploadIndex].textClass = "successColor";
-          }
-        );
-      });
-    }
-  }
-
-  beforeUnmount(): void {
-    this.uploads.forEach((upload) => {
-      upload.task.cancel();
-    });
-  }
-}
-</script>
 
 <style lang="scss" scoped>
 .dropbox {
