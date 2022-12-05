@@ -1,50 +1,143 @@
+<script setup lang="ts">
+import { formatTime } from "../utils";
+import { Howl } from "howler";
+import type { ITrack } from "../types";
+import { computed, ref } from "vue";
+
+// data
+const currentSong = ref<ITrack | null>(null);
+const sound = ref<Howl | null>(null);
+const seek = ref<string>("00:00");
+const duration = ref<string>("00:00");
+const playerProgress = ref<string>("0%");
+
+// computed
+const playing = computed<boolean>(() => {
+  if (sound.value?.playing) {
+    return sound.value.playing();
+  }
+  return false;
+});
+
+// methods
+function toggleAudio(): void {
+  if (!sound.value?.playing) {
+    return;
+  }
+
+  sound.value.playing() ? sound.value.pause() : sound.value.play();
+}
+
+function updatePosition(): void {
+  if (sound.value) {
+    seek.value = formatTime(sound.value.seek());
+    duration.value = formatTime(sound.value.duration());
+    playerProgress.value = `${
+      (sound.value.seek() / sound.value.duration()) * 100
+    }%`;
+  }
+}
+
+function updateSeek(e: MouseEvent): void {
+  const element = e.currentTarget as HTMLElement;
+
+  if (!sound.value?.playing()) {
+    return;
+  }
+  const { x, width } = element.getBoundingClientRect();
+  const clickX = e.clientX - x;
+  const percentage = clickX / width;
+  const seconds = sound.value.duration() * percentage;
+
+  sound.value.seek(seconds);
+  sound.value.once("seek", () => {
+    progress();
+  });
+}
+
+function newSong(payload: ITrack): void {
+  if (sound.value instanceof Howl) {
+    sound.value.unload();
+  }
+  currentSong.value = payload;
+  sound.value = new Howl({
+    src: [payload.url],
+    html5: true,
+  });
+
+  if (sound) {
+    sound.value.play();
+    // update track progress bar as track plays
+    sound.value.on("play", () => {
+      requestAnimationFrame(() => {
+        updatePosition();
+        if (sound.value?.playing()) {
+          requestAnimationFrame(() => {
+            progress();
+          });
+        }
+      });
+    });
+  }
+}
+
+function progress(): void {
+  updatePosition();
+
+  if (sound.value?.playing()) {
+    requestAnimationFrame(() => {
+      progress();
+    });
+  }
+}
+
+function playTrack(): void {
+  if (sound.value) {
+    sound.value.play();
+  }
+}
+
+defineExpose({
+  newSong,
+  playTrack,
+});
+</script>
+
 <template>
   <div class="player-wrapper">
     <div class="player">
       <!-- Play/Pause Button -->
       <div class="playPause">
-        <i
+        <font-awesome-icon
           id="player-play-button"
           @click.prevent="toggleAudio"
-          class="fa icon icon--play"
-          :class="{ 'fa-play': !playing, 'fa-pause': playing }"
-        ></i>
+          class="icon icon--play"
+          :icon="['fa-solid', playing ? 'fa-pause' : 'fa-play']"
+        ></font-awesome-icon>
       </div>
-
       <!-- Current Position -->
       <div class="currentPosition">
         <span class="player-currenttime">{{ seek }}</span>
       </div>
-
       <!-- Scrub -->
       <div class="player-scrub">
-        <div
-          v-if="currentSong.modifiedName"
-          class="track-info"
-        >
+        <div v-if="currentSong && currentSong.modifiedName" class="track-info">
           <span class="song-title">{{ currentSong.artist }} - </span>
           <span class="song-artist">{{ currentSong.modifiedName }}</span>
         </div>
         <!-- Scrub Container  -->
-        <span
-          class="scrub-container"
-          @click.prevent="updateSeek"
-        >
+        <span class="scrub-container" @click.prevent="updateSeek">
           <!-- Player Ball -->
-          <span
-            class="playerBall"
-            :style="{ left: playerProgress }"
-          >
-            <i class="fas fa-circle"></i>
+          <span class="playerBall" :style="{ left: playerProgress }">
+            <font-awesome-icon
+              class="fas fa-circle"
+              icon="fa-solid fa-circle"
+            ></font-awesome-icon>
           </span>
           <!-- Player Progress Bar-->
-          <span
-            class="scrubBar"
-            :style="{ width: playerProgress }"
-          ></span>
+          <span class="scrubBar" :style="{ width: playerProgress }"></span>
         </span>
       </div>
-
       <!-- Duration -->
       <div class="duration">
         <span class="player-duration">{{ duration }}</span>
@@ -52,109 +145,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { formatTime } from "@/includes/helpers";
-import { Howl } from "howler";
-import { TrackDto } from "@/types";
-
-@Options({
-  name: "MusicPlayer"
-})
-export default class MusicPlayer extends Vue {
-  private currentSong: TrackDto | null = new TrackDto();
-  private sound: Howl | null = null;
-  private seek = "00:00";
-  private duration = "00:00";
-  private playerProgress = "0%";
-
-  toggleAudio(): void {
-    if (!this.sound?.playing) {
-      return;
-    }
-
-    this.sound.playing() ? this.sound.pause() : this.sound.play();
-  }
-
-  updatePosition(): void {
-    if (this.sound) {
-      this.seek = formatTime(this.sound.seek());
-      this.duration = formatTime(this.sound.duration());
-      this.playerProgress = `${
-        (this.sound.seek() / this.sound.duration()) * 100
-      }%`;
-    }
-  }
-
-  updateSeek(e: MouseEvent): void {
-    const element = e.currentTarget as HTMLElement;
-
-    if (!this.sound?.playing()) {
-      return;
-    }
-    const { x, width } = element.getBoundingClientRect();
-    const clickX = e.clientX - x;
-    const percentage = clickX / width;
-    const seconds = this.sound.duration() * percentage;
-
-    this.sound.seek(seconds);
-    this.sound.once("seek", () => {
-      this.progress();
-    });
-  }
-
-  newSong(payload: TrackDto): void {
-    if (this.sound instanceof Howl) {
-      this.sound.unload();
-    }
-
-    this.currentSong = payload;
-    this.sound = new Howl({
-      src: [payload.url],
-      html5: true
-    });
-
-    if (this.sound) {
-      this.sound.play();
-      // update track progress bar as track plays
-      this.sound.on("play", () => {
-        requestAnimationFrame(() => {
-          this.updatePosition();
-          if (this.sound?.playing()) {
-            requestAnimationFrame(() => {
-              this.progress();
-            });
-          }
-        });
-      });
-    }
-  }
-
-  progress(): void {
-    this.updatePosition();
-
-    if (this.sound?.playing()) {
-      requestAnimationFrame(() => {
-        this.progress();
-      });
-    }
-  }
-
-  get playing(): boolean {
-    if (this.sound?.playing) {
-      return this.sound.playing();
-    }
-    return false;
-  }
-
-  playTrack(): void {
-    if (this.sound) {
-      this.sound.play();
-    }
-  }
-}
-</script>
 
 <style lang="scss" scoped>
 .player-wrapper {

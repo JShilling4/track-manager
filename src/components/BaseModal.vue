@@ -1,19 +1,62 @@
+<script setup lang="ts">
+import { watch } from "vue";
+
+export type PropTypes = {
+  width?: string;
+  show: boolean;
+  clickaway?: boolean;
+  showCloseButton?: boolean;
+  isLoading?: boolean;
+  isPosting?: boolean;
+  classes?: string;
+  backgroundColor?: string;
+};
+
+const props = withDefaults(defineProps<PropTypes>(), {
+  show: false,
+  width: "600px",
+  clickaway: false,
+  showCloseButton: true,
+  isLoading: false,
+  isPosting: false,
+  classes: "",
+  backgroundColor: "#fff",
+});
+
+const emit = defineEmits<{
+  (e: "close"): void;
+  (e: "saveProperty"): void;
+  (e: "saveAddress"): void;
+}>();
+
+watch(
+  () => props.show,
+  (newVal: boolean) => {
+    if (newVal) {
+      document.querySelector("body")?.classList.add("overflow-hidden");
+    } else {
+      document.querySelector("body")?.classList.remove("overflow-hidden");
+    }
+  }
+);
+
+function closeModal(): void {
+  emit("close");
+  document.querySelector("body")?.classList.remove("overflow-hidden");
+}
+function clickAway(): void {
+  if (props.clickaway) {
+    emit("close");
+  }
+}
+</script>
+
 <template>
-  <transition
-    name="fade"
-    appear
-  >
-    <div
-      class="modal-backdrop"
-      @click="clickAway"
-      v-if="show"
-    />
+  <transition name="fade" appear>
+    <div class="modal-backdrop" @click="clickAway" v-if="show" />
   </transition>
 
-  <transition
-    name="slide-vertical"
-    appear
-  >
+  <transition name="slide-vertical" appear>
     <div
       class="modal-dialog"
       :style="`width: ${width}; background-color: ${backgroundColor}`"
@@ -27,10 +70,7 @@
           class="modal-close"
           @click="closeModal"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 352 512"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512">
             <path
               fill="currentColor"
               d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
@@ -49,83 +89,6 @@
     </div>
   </transition>
 </template>
-
-<script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-
-@Options({
-  name: "BaseModal",
-  emits: ["close", "saveProperty", "saveAddress"]
-})
-export default class BaseModal extends Vue {
-  @Prop({
-    type: String,
-    default: "600px"
-  })
-  width!: string;
-
-  @Prop({
-    type: Boolean,
-    required: true
-  })
-  show!: boolean;
-
-  @Prop({
-    type: Boolean,
-    default: false
-  })
-  clickaway!: boolean;
-
-  @Prop({
-    type: Boolean,
-    default: true
-  })
-  showCloseButton!: boolean;
-
-  @Prop({
-    type: Boolean,
-    default: false
-  })
-  isLoading!: boolean;
-
-  @Prop({
-    type: Boolean
-  })
-  isPosting?: boolean;
-
-  @Prop({
-    type: String,
-    default: ""
-  })
-  classes!: string;
-
-  @Prop({
-    type: String,
-    default: "#fff"
-  })
-  backgroundColor!: string;
-
-  @Watch("show")
-  onShowChanged(val: boolean): void {
-    if (val) {
-      document.querySelector("body")?.classList.add("overflow-hidden");
-    } else {
-      document.querySelector("body")?.classList.remove("overflow-hidden");
-    }
-  }
-
-  private closeModal(): void {
-    this.$emit("close");
-    document.querySelector("body")?.classList.remove("overflow-hidden");
-  }
-  private clickAway(): void {
-    if (this.clickaway) {
-      this.$emit("close");
-    }
-  }
-}
-</script>
 
 <style lang="scss" scoped>
 .modal {

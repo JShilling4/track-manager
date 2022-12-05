@@ -1,66 +1,58 @@
+<script setup lang="ts">
+export type PropTypes = {
+  showMobileMenu?: boolean;
+};
+
+const props = withDefaults(defineProps<PropTypes>(), {
+  showMobileMenu: false,
+});
+
+const emit = defineEmits<{
+  (e: "open"): void;
+  (e: "close"): void;
+}>();
+
+function openMobileMenu() {
+  emit("open");
+}
+
+function closeMobileMenu() {
+  emit("close");
+}
+</script>
+
 <template>
   <header class="header">
     <div>
       <h1>Set Manager</h1>
     </div>
 
-    <nav
-      v-if="showMobileMenu"
-      class="nav"
-    >
-      <router-link
-        to="/"
-        class="nav-item"
-        @click="$emit('close')"
-      >
-        Home
-      </router-link>
-      <router-link
-        to="/tracks"
-        class="nav-item"
-        @click="$emit('close')"
-      >
+    <nav v-if="props.showMobileMenu" class="nav">
+      <router-link to="/tracks" class="nav-item" @click="closeMobileMenu">
         Tracks
       </router-link>
-      <router-link
-        to="/lists"
-        class="nav-item"
-        @click="$emit('close')"
-      >
+      <router-link to="/sets" class="nav-item" @click="closeMobileMenu">
         Sets
       </router-link>
     </nav>
-
-    <i
-      v-if="showMobileMenu"
+    <font-awesome-icon
+      v-if="props.showMobileMenu"
       alt="close mobile menu icon"
-      @click="$emit('close')"
-      class="fas fa-times mobileClose"
-    ></i>
-    <i
+      @click="closeMobileMenu"
+      class="mobileClose"
+      icon="fa-solid fa-times"
+    >
+    </font-awesome-icon>
+    <font-awesome-icon
       v-else
       alt="mobile menu icon"
-      @click="$emit('open')"
-      class="fas fa-bars hamburger"
-    ></i>
+      @click="openMobileMenu"
+      class="hamburger"
+      icon="fa-solid fa-bars"
+    >
+    </font-awesome-icon>
   </header>
 </template>
-
-<script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
-
-@Options({
-  emits: ["open", "close"]
-})
-export default class TheNavbar extends Vue {
-  @Prop({
-    type: Boolean,
-    default: false
-  })
-  showMobileMenu!: boolean;
-}
-</script>
 
 <style lang="scss" scoped>
 .header {

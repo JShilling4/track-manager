@@ -1,48 +1,23 @@
+/* eslint-env node */
 module.exports = {
   root: true,
-  env: {
-    node: true
-  },
   extends: [
-    "plugin:@typescript-eslint/recommended",
-    "plugin:vue/vue3-essential",
+    "plugin:vue/vue3-strongly-recommended",
     "eslint:recommended",
-    "@vue/typescript/recommended",
-    "prettier"
+    "@vue/eslint-config-typescript/recommended",
+    "@vue/eslint-config-prettier",
   ],
-  parserOptions: {
-    ecmaVersion: 2020
+  env: {
+    "vue/setup-compiler-macros": true,
   },
   rules: {
-    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "@typescript-eslint/ban-types": [
+    "vue/require-default-prop": "off",
+    "prettier/prettier": [
       "error",
       {
-        types: {
-          String: false,
-          Boolean: false,
-          Number: false,
-          Symbol: false,
-          "{}": false,
-          object: false,
-          Function: false
-        },
-        extendDefaults: true
-      }
+        endOfLine: "auto",
+      },
     ],
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": ["warn"]
   },
-  overrides: [
-    {
-      files: [
-        "**/__tests__/*.{j,t}s?(x)",
-        "**/tests/unit/**/*.spec.{j,t}s?(x)"
-      ],
-      env: {
-        jest: true
-      }
-    }
-  ]
+  ignorePatterns: ["dist"],
 };

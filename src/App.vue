@@ -1,44 +1,33 @@
+<script setup lang="ts">
+import { nextTick, onMounted, ref } from "vue";
+import TheNavbar from "./components/TheNavbar.vue";
+
+const isMobileMenuVisible = ref<boolean>(false);
+const windowWidth = ref<number>(document.documentElement.clientWidth);
+
+onMounted(() => {
+  nextTick(() => {
+    window.addEventListener("resize", getWindowWidth);
+  });
+});
+
+function getWindowWidth() {
+  windowWidth.value = document.documentElement.clientWidth;
+}
+</script>
+
 <template>
   <TheNavbar
     class="container"
-    :show-mobile-menu="showMobileMenu || windowWidth > 768"
-    @open="showMobileMenu = true"
-    @close="showMobileMenu = false"
+    :show-mobile-menu="isMobileMenuVisible || windowWidth > 768"
+    @open="isMobileMenuVisible = true"
+    @close="isMobileMenuVisible = false"
   />
   <router-view />
 </template>
 
-<script lang="ts">
-import { TheNavbar } from "@/components";
-import { Options, Vue } from "vue-class-component";
-
-@Options({
-  components: {
-    TheNavbar
-  }
-})
-export default class App extends Vue {
-  private showMobileMenu = false;
-  private windowWidth = document.documentElement.clientWidth;
-
-  getWindowWidth(): void {
-    this.windowWidth = document.documentElement.clientWidth;
-  }
-
-  mounted(): void {
-    this.$nextTick(() => {
-      window.addEventListener("resize", this.getWindowWidth);
-    });
-  }
-}
-</script>
-
 <style src="@vueform/multiselect/themes/default.css"></style>
 <style lang="scss">
-@import "~@/scss/variables";
-@import "~@/scss/base";
-@import "~@/scss/typography";
-
 .container {
   max-width: 1500px;
   margin: 0 auto;
@@ -70,8 +59,7 @@ export default class App extends Vue {
 
 .icon {
   border-radius: 5px;
-  height: 3rem;
-  width: 3rem;
+  padding: 5px;
   cursor: pointer;
   display: flex;
   justify-content: center;
