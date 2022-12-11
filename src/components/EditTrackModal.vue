@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Multiselect from "@vueform/multiselect";
-import tracksRepository from "../repositories/tracksRepository";
+import { tracksRepository } from "../repositories/tracksRepository";
 import cloneDeep from "lodash/cloneDeep";
 import FormLabel from "./FormLabel.vue";
 import TextInput from "./TextInput.vue";

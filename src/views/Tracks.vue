@@ -2,8 +2,8 @@
 import TrackItem from "../components/TrackItem.vue";
 import TrackUpload from "../components/TrackUpload.vue";
 import MusicPlayer from "../components/MusicPlayer.vue";
-import tracksRepository from "../repositories/tracksRepository";
-import categoriesRepository from "../repositories/categoriesRepository";
+import { tracksRepository } from "../repositories/tracksRepository";
+import { categoriesRepository } from "../repositories/categoriesRepository";
 import { ICategory, ITrack } from "../types";
 import { addToUITrackListKey, updateUITrackListKey } from "../symbols";
 import { firebase } from "../repositories/clients/firebaseClient";
@@ -26,11 +26,6 @@ const selectedTracks = computed<ITrack[]>(() => {
   return selectedCategory.value === "All"
     ? tracks.value
     : tracks.value.filter((track) => track.category === selectedCategory.value);
-});
-
-onBeforeMount(async () => {
-  tracks.value = await tracksRepository.getAll();
-  categories.value = await categoriesRepository.getAll();
 });
 
 function playTrack(track: ITrack): void {
@@ -89,6 +84,11 @@ function categoryCount(categoryName: string): number {
     ? tracks.value.length
     : tracks.value.filter((track) => track.category === categoryName).length;
 }
+
+onBeforeMount(async () => {
+  tracks.value = await tracksRepository.getAll();
+  categories.value = await categoriesRepository.getAll();
+});
 </script>
 
 <template>

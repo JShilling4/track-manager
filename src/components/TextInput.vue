@@ -2,7 +2,7 @@
 import { CSSProperties } from "vue";
 
 export type PropTypes = {
-  modelValue: string;
+  modelValue: string | number;
   borderRadius?: string;
   classList?: string;
   isCurrency?: boolean;

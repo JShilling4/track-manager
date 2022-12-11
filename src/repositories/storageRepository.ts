@@ -1,6 +1,7 @@
+import { IStorageRepository } from "../types/storageRepository";
 import { storage, firebase } from "./clients/firebaseClient";
 
-export default {
+export const storageRepository: IStorageRepository = {
   put(file: File): firebase.storage.UploadTask {
     const fileName = file.name.split(".").slice(0, -1).join(".");
     const storageRef = storage.ref();

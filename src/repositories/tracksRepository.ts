@@ -1,8 +1,8 @@
 import { tracksCollection, firebase } from "./clients/firebaseClient";
+import { storageRepository } from "./storageRepository";
 import type { ITrack } from "../types/ITrack";
-import storageRepository from "./storageRepository";
 
-export default {
+export const tracksRepository = {
   async getAll(): Promise<ITrack[]> {
     const trackSnapshots = await tracksCollection.get();
     const tracks: ITrack[] = [];
