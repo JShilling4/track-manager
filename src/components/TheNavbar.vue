@@ -24,7 +24,7 @@ function closeMobileMenu() {
 <template>
   <header class="header">
     <div>
-      <h1>Set Manager</h1>
+      <h1>Band Manager</h1>
     </div>
 
     <nav v-if="props.showMobileMenu" class="nav">
@@ -33,6 +33,9 @@ function closeMobileMenu() {
       </router-link>
       <router-link to="/sets" class="nav-item" @click="closeMobileMenu">
         Sets
+      </router-link>
+      <router-link to="/calendar" class="nav-item" @click="closeMobileMenu">
+        Calendar
       </router-link>
     </nav>
     <font-awesome-icon

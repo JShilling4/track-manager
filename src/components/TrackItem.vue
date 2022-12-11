@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import EditTrackModal from "./EditTrackModal.vue";
-import tracksRepository from "../repositories/tracksRepository";
-import storageRepository from "../repositories/storageRepository";
+import { tracksRepository } from "../repositories/tracksRepository";
+import { storageRepository } from "../repositories/storageRepository";
 import { ICategory, ITrack } from "../types";
 import { computed, inject, ref } from "vue";
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import tracksRepository from "../repositories/tracksRepository";
-import storageRepository from "../repositories/storageRepository";
+import { tracksRepository } from "../repositories/tracksRepository";
+import { storageRepository } from "../repositories/storageRepository";
 import { ITrackUpload, ITrack } from "../types";
 import { addToUITrackListKey } from "../symbols";
 import { inject, onBeforeUnmount, ref } from "vue";
