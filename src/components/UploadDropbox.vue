@@ -63,6 +63,7 @@ function uploadSongs(files: File[]): void {
       task.on(
         "state_changed",
         (snapshot) => {
+          console.log("new track state change: ", snapshot);
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           uploads.value[uploadIndex].currentProgress = progress;
@@ -94,14 +95,13 @@ function uploadSongs(files: File[]): void {
             lastUpdated: new Date().toISOString(),
           };
           track.url = await task.snapshot.ref.getDownloadURL();
-
-          if (!track) {
-            const trackRef = await tracksRepository.add(track);
-            const trackSnapshot = await trackRef.get();
-            addToUITrackList && addToUITrackList(trackSnapshot);
-          } else {
-            emit("edit", track);
-          }
+          console.log(track);
+          console.log("adding track to FB: ", track);
+          const trackRef = await tracksRepository.add(track);
+          const trackSnapshot = await trackRef.get();
+          console.log("adding track to UI: ", trackSnapshot);
+          addToUITrackList && addToUITrackList(trackSnapshot);
+          // emit("edit", track);
 
           uploads.value[uploadIndex].variant = "successColor";
           uploads.value[uploadIndex].icon = "fas fa-check";
