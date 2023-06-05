@@ -40,10 +40,11 @@ function onFileDrop(e: DragEvent): void {
 function uploadSongs(files: File[]): void {
   if (files) {
     files.forEach(async (file: File) => {
-      // stop if file is not mp3
-      if (file.type !== "audio/mpeg") {
-        return;
-      }
+      // stop if file is not or wav
+      // console.log(file.type);
+      // if (file.type !== ("audio/mpeg" as string) || file.type !== "audio/wav") {
+      //   return;
+      // }
       // Delete the file first if it exists
       if (props.track) {
         await storageRepository.delete(props.track.originalName);
