@@ -62,7 +62,7 @@ importers:
         version: 5.59.7(eslint@8.41.0)(typescript@5.0.4)
       '@vitejs/plugin-vue':
         specifier: ^3.2.0
-        version: 3.2.0(vite@3.2.10(@types/node@18.16.14)(sass@1.62.1))(vue@3.3.4)
+        version: 3.2.0(vite@3.2.11(@types/node@18.16.14)(sass@1.62.1))(vue@3.3.4)
       '@vue/eslint-config-prettier':
         specifier: ^7.1.0
         version: 7.1.0(eslint@8.41.0)(prettier@2.8.8)
@@ -88,8 +88,8 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4
       vite:
-        specifier: ^3.2.10
-        version: 3.2.10(@types/node@18.16.14)(sass@1.62.1)
+        specifier: ^3.2.11
+        version: 3.2.11(@types/node@18.16.14)(sass@1.62.1)
       vue-tsc:
         specifier: ^1.6.5
         version: 1.6.5(typescript@5.0.4)
@@ -308,17 +308,17 @@ packages:
       '@fortawesome/fontawesome-svg-core': ~1 || ~6
       vue: '>= 3.0.0 < 4'
 
-  '@grpc/grpc-js@1.8.14':
-    resolution: {integrity: sha512-w84maJ6CKl5aApCMzFll0hxtFNT6or9WwMslobKaqWUEf1K+zhlL43bSQhFreyYWIWR+Z0xnVFC1KtLm4ZpM/A==}
-    engines: {node: ^8.13.0 || >=10.10.0}
+  '@grpc/grpc-js@1.12.2':
+    resolution: {integrity: sha512-bgxdZmgTrJZX50OjyVwz3+mNEnCTNkh3cIqGPWVNeW9jX6bn1ZkU80uPd+67/ZpIJIjRQ9qaHCjhavyoWYxumg==}
+    engines: {node: '>=12.10.0'}
 
   '@grpc/proto-loader@0.6.13':
     resolution: {integrity: sha512-FjxPYDRTn6Ec3V0arm1FtSpmP6V50wuph2yILpyvTKzjc76oDdoihXqM1DzOW5ubvCC8GivfCnNtfaRE8myJ7g==}
     engines: {node: '>=6'}
     hasBin: true
 
-  '@grpc/proto-loader@0.7.7':
-    resolution: {integrity: sha512-1TIeXOi8TuSCQprPItwoMymZXxWT0CPxUhkrkeCUH+D8U7QDwQ6b7SUz2MaLuWM2llT+J/TVFLmQI5KtML3BhQ==}
+  '@grpc/proto-loader@0.7.13':
+    resolution: {integrity: sha512-AiXO/bfe9bmxBjxxtYxFAXGZvMaN5s8kO+jBHAJCON8rJoB5YS/D6X7ZNc6XQkuHNmyl4CYaMI1fJ/Gn27RGGw==}
     engines: {node: '>=6'}
     hasBin: true
 
@@ -337,6 +337,9 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.4.15':
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
+
+  '@js-sdsl/ordered-map@4.4.2':
+    resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -841,6 +844,7 @@ packages:
   eslint@8.41.0:
     resolution: {integrity: sha512-WQDQpzGBOP5IrXPo4Hc0814r4/v2rrIsB0rhT7jtunIalgg6gYXWhRMOejVO8yH21T/FGaxjmFjBMNqcIlmH1Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   espree@9.5.2:
@@ -1187,8 +1191,8 @@ packages:
     resolution: {integrity: sha512-5kQWPaJHi1WoCpjTGszzQ32PG2F4+wRY6BmAT4Vfw56Q2FZ4YZzK20xUYQH4YkfehY1e6QSICrJquM6xXZNcrw==}
     hasBin: true
 
-  protobufjs@7.2.3:
-    resolution: {integrity: sha512-TtpvOqwB5Gdz/PQmOjgsrGH1nHjAQVCN7JG4A6r1sXRWESL5rNMAiRcBQlCAdKxZcAbstExQePYG8xof/JVRgg==}
+  protobufjs@7.4.0:
+    resolution: {integrity: sha512-mRUWCc3KUU4w1jU8sGxICXH/gNS94DvI1gxqDvBzhj1JpcsimQkYiOJfwsPUykUI5ZaspFbSgmBLER8IrQ3tqw==}
     engines: {node: '>=12.0.0'}
 
   punycode@2.3.0:
@@ -1322,8 +1326,8 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  vite@3.2.10:
-    resolution: {integrity: sha512-Dx3olBo/ODNiMVk/cA5Yft9Ws+snLOXrhLtrI3F4XLt4syz2Yg8fayZMWScPKoz12v5BUv7VEmQHnsfpY80fYw==}
+  vite@3.2.11:
+    resolution: {integrity: sha512-K/jGKL/PgbIgKCiJo5QbASQhFiV02X9Jh+Qq0AKCRCRKZtOTVi4t6wh75FDpGf2N9rYOnzH87OEFQNaFy6pdxQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -1570,7 +1574,7 @@ snapshots:
       '@firebase/logger': 0.2.6
       '@firebase/util': 1.1.0
       '@firebase/webchannel-wrapper': 0.5.1
-      '@grpc/grpc-js': 1.8.22
+      '@grpc/grpc-js': 1.12.2
       '@grpc/proto-loader': 0.6.13
       node-fetch: 2.6.1
       tslib: 2.5.2
@@ -1694,12 +1698,10 @@ snapshots:
       '@fortawesome/fontawesome-svg-core': 6.4.0
       vue: 3.3.4
 
-  /@grpc/grpc-js@1.8.22:
-    resolution: {integrity: sha512-oAjDdN7fzbUi+4hZjKG96MR6KTEubAeMpQEb+77qy+3r0Ua5xTFuie6JOLr4ZZgl5g+W5/uRTS2M1V8mVAFPuA==}
-    engines: {node: ^8.13.0 || >=10.10.0}
+  '@grpc/grpc-js@1.12.2':
     dependencies:
-      '@grpc/proto-loader': 0.7.7
-      '@types/node': 18.16.14
+      '@grpc/proto-loader': 0.7.13
+      '@js-sdsl/ordered-map': 4.4.2
 
   '@grpc/proto-loader@0.6.13':
     dependencies:
@@ -1709,12 +1711,11 @@ snapshots:
       protobufjs: 6.11.4
       yargs: 16.2.0
 
-  '@grpc/proto-loader@0.7.7':
+  '@grpc/proto-loader@0.7.13':
     dependencies:
-      '@types/long': 4.0.2
       lodash.camelcase: 4.3.0
-      long: 4.0.0
-      protobufjs: 7.2.3
+      long: 5.2.3
+      protobufjs: 7.4.0
       yargs: 17.7.2
 
   '@humanwhocodes/config-array@0.11.8':
@@ -1730,6 +1731,8 @@ snapshots:
   '@humanwhocodes/object-schema@1.2.1': {}
 
   '@jridgewell/sourcemap-codec@1.4.15': {}
+
+  '@js-sdsl/ordered-map@4.4.2': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -1862,9 +1865,9 @@ snapshots:
       '@typescript-eslint/types': 5.59.7
       eslint-visitor-keys: 3.4.1
 
-  '@vitejs/plugin-vue@3.2.0(vite@3.2.10(@types/node@18.16.14)(sass@1.62.1))(vue@3.3.4)':
+  '@vitejs/plugin-vue@3.2.0(vite@3.2.11(@types/node@18.16.14)(sass@1.62.1))(vue@3.3.4)':
     dependencies:
-      vite: 3.2.10(@types/node@18.16.14)(sass@1.62.1)
+      vite: 3.2.11(@types/node@18.16.14)(sass@1.62.1)
       vue: 3.3.4
 
   '@volar/language-core@1.4.1':
@@ -2599,7 +2602,7 @@ snapshots:
       '@types/node': 18.16.14
       long: 4.0.0
 
-  protobufjs@7.2.3:
+  protobufjs@7.4.0:
     dependencies:
       '@protobufjs/aspromise': 1.1.2
       '@protobufjs/base64': 1.1.2
@@ -2717,7 +2720,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite@3.2.10(@types/node@18.16.14)(sass@1.62.1):
+  vite@3.2.11(@types/node@18.16.14)(sass@1.62.1):
     dependencies:
       esbuild: 0.15.18
       postcss: 8.4.31
