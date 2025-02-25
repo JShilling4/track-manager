@@ -145,6 +145,8 @@ onBeforeMount(async () => {
 </template>
 
 <style lang="scss" scoped>
+@use "../scss/mixins" as *;
+
 h2 {
   margin-bottom: 2rem;
 }

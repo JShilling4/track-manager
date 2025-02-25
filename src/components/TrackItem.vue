@@ -102,6 +102,8 @@ function playTrack(): void {
 </template>
 
 <style lang="scss" scoped>
+@use "../scss/mixins" as *;
+
 .trackItem {
   display: flex;
   justify-content: space-between;

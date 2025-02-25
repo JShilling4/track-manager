@@ -91,6 +91,8 @@ function clickAway(): void {
 </template>
 
 <style lang="scss" scoped>
+@use "../scss/mixins" as *;
+
 .modal {
   position: fixed;
   top: 0;

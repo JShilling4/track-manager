@@ -8,9 +8,10 @@ export default defineConfig({
     "process.env": process.env,
   },
   css: {
+    devSourcemap: true,
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "src/scss/main.scss";`,
+        api: "modern-compiler",
       },
     },
   },

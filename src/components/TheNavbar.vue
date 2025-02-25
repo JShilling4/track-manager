@@ -58,6 +58,9 @@ function closeMobileMenu() {
 </template>
 
 <style lang="scss" scoped>
+@use "sass:color";
+@use "../scss/mixins" as *;
+
 .header {
   position: relative;
   display: flex;
@@ -107,7 +110,7 @@ function closeMobileMenu() {
         font-size: 1.8rem;
       }
       &:hover {
-        color: lighten(#333, 40%);
+        color: color.adjust(#333, $lightness: 40%)
       }
       &.router-link-active:after {
         position: absolute;
