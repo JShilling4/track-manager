@@ -4,7 +4,7 @@ import TrackUpload from "../components/TrackUpload.vue";
 import MusicPlayer from "../components/MusicPlayer.vue";
 import { tracksRepository } from "../repositories/tracksRepository";
 import { categoriesRepository } from "../repositories/categoriesRepository";
-import { ICategory, ITrack } from "../types";
+import { AddToUITrackListFunction, ICategory, ITrack } from "../types";
 import { addToUITrackListKey, updateUITrackListKey } from "../symbols";
 import { firebase } from "../repositories/clients/firebaseClient";
 import { computed, onBeforeMount, provide, ref } from "vue";
@@ -69,7 +69,7 @@ function addToUITrackList(
     url,
   });
 }
-provide(addToUITrackListKey, addToUITrackList);
+provide(addToUITrackListKey, addToUITrackList as AddToUITrackListFunction);
 
 function updateUITrackList(track: ITrack): void {
   const index = tracks.value.findIndex((t) => t.docID === track.docID);
