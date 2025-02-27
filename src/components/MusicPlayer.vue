@@ -147,6 +147,8 @@ defineExpose({
 </template>
 
 <style lang="scss" scoped>
+@use "../scss/mixins" as *;
+
 .player-wrapper {
   position: fixed;
   bottom: 0;

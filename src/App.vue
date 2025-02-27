@@ -28,7 +28,7 @@ function getWindowWidth() {
 
 <style src="@vueform/multiselect/themes/default.css"></style>
 <style lang="scss">
-@import "./scss/reset.scss";
+@use "./scss/main";
 
 .container {
   max-width: 1500px;
