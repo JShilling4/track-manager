@@ -24,20 +24,10 @@ function closeMobileMenu() {
 <template>
   <header class="header">
     <div>
-      <h1>Band Manager</h1>
+      <h1>Track Manager</h1>
     </div>
 
-    <nav v-if="props.showMobileMenu" class="nav">
-      <router-link to="/tracks" class="nav-item" @click="closeMobileMenu">
-        Tracks
-      </router-link>
-      <router-link to="/sets" class="nav-item" @click="closeMobileMenu">
-        Sets
-      </router-link>
-      <router-link to="/calendar" class="nav-item" @click="closeMobileMenu">
-        Calendar
-      </router-link>
-    </nav>
+    <nav v-if="props.showMobileMenu" class="nav"></nav>
     <font-awesome-icon
       v-if="props.showMobileMenu"
       alt="close mobile menu icon"
@@ -110,7 +100,7 @@ function closeMobileMenu() {
         font-size: 1.8rem;
       }
       &:hover {
-        color: color.adjust(#333, $lightness: 40%)
+        color: color.adjust(#333, $lightness: 40%);
       }
       &.router-link-active:after {
         position: absolute;
